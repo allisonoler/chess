@@ -24,23 +24,6 @@ public class ChessPosition {
         return this.row;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ChessPosition that = (ChessPosition) o;
-        return row == that.row && col == that.col;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(row, col);
-    }
-
     /**
      * @return which column this position is in
      * 1 codes for the left row
