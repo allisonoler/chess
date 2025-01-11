@@ -70,7 +70,27 @@ public class ChessPiece {
         return possibleMoves;
     }
 
+    private Collection<ChessMove> kingPieceMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> possibleMoves = new ArrayList<ChessMove>();
+        goodMove(board, myPosition, possibleMoves, myPosition.getRow()+1, myPosition.getColumn());
+        goodMove(board, myPosition, possibleMoves, myPosition.getRow()+1, myPosition.getColumn() + 1);
+        goodMove(board, myPosition, possibleMoves, myPosition.getRow()+1, myPosition.getColumn() -1);
+        goodMove(board, myPosition, possibleMoves, myPosition.getRow()-1, myPosition.getColumn());
+        goodMove(board, myPosition, possibleMoves, myPosition.getRow()-1, myPosition.getColumn() + 1);
+        goodMove(board, myPosition, possibleMoves, myPosition.getRow()-1, myPosition.getColumn() - 1);
+        goodMove(board, myPosition, possibleMoves, myPosition.getRow(), myPosition.getColumn() - 1);
+        goodMove(board, myPosition, possibleMoves, myPosition.getRow(), myPosition.getColumn() + 1);
+        return possibleMoves;
+    }
+
+    private boolean inBounds(int row, int col) {
+        return row > 0 && row < 9 && col > 0 && col < 9;
+    }
+
     private boolean goodMove(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> possibleMoves, int i, int j) {
+        if (!inBounds(i, j)) {
+            return false;
+        }
         ChessPosition possiblePosition = new ChessPosition(i, j);
         if (board.getPiece(possiblePosition) != null) {
             if (board.getPiece(possiblePosition).getTeamColor() == board.getPiece(myPosition).getTeamColor()) {
@@ -112,6 +132,7 @@ public class ChessPiece {
         Collection<ChessMove> possibleMoves = new ArrayList<ChessMove>();
         switch (this.pieceType) {
             case KING -> {
+                possibleMoves = kingPieceMoves(board, myPosition);
             }
             case BISHOP -> {
                 possibleMoves = bishopPieceMoves(board, myPosition);
