@@ -83,6 +83,25 @@ public class ChessPiece {
         return possibleMoves;
     }
 
+    private Collection<ChessMove> knightPieceMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> possibleMoves = new ArrayList<ChessMove>();
+        goodMove(board, myPosition, possibleMoves, myPosition.getRow()+2, myPosition.getColumn()-1);
+        goodMove(board, myPosition, possibleMoves, myPosition.getRow()+2, myPosition.getColumn() + 1);
+        goodMove(board, myPosition, possibleMoves, myPosition.getRow()-2, myPosition.getColumn() -1);
+        goodMove(board, myPosition, possibleMoves, myPosition.getRow()-2, myPosition.getColumn()+1);
+        goodMove(board, myPosition, possibleMoves, myPosition.getRow()+1, myPosition.getColumn() + 2);
+        goodMove(board, myPosition, possibleMoves, myPosition.getRow()+1, myPosition.getColumn() - 2);
+        goodMove(board, myPosition, possibleMoves, myPosition.getRow()-1, myPosition.getColumn() - 2);
+        goodMove(board, myPosition, possibleMoves, myPosition.getRow()-1, myPosition.getColumn() + 2);
+        return possibleMoves;
+    }
+
+    private Collection<ChessMove> pawnPieceMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> possibleMoves = new ArrayList<ChessMove>();
+        goodMove(board, myPosition, possibleMoves, myPosition.getRow(), myPosition.getColumn()+1);
+        return possibleMoves;
+    }
+
     private boolean inBounds(int row, int col) {
         return row > 0 && row < 9 && col > 0 && col < 9;
     }
@@ -136,6 +155,12 @@ public class ChessPiece {
             }
             case BISHOP -> {
                 possibleMoves = bishopPieceMoves(board, myPosition);
+            }
+            case KNIGHT -> {
+                possibleMoves = knightPieceMoves(board, myPosition);
+            }
+            case PAWN -> {
+                possibleMoves = pawnPieceMoves(board, myPosition);
             }
         }
         return possibleMoves;
