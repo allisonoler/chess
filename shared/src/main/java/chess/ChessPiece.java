@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Objects;
 
 /**
@@ -96,10 +97,65 @@ public class ChessPiece {
         return possibleMoves;
     }
 
+    private boolean enemyHere(ChessBoard board, ChessPosition myPosition, ChessPosition newPosition) {
+        if (inBounds(newPosition.getRow(), newPosition.getColumn())&& board.getPiece(newPosition) != null) {
+            if (board.getPiece(newPosition).getTeamColor() != board.getPiece(myPosition).getTeamColor()) {
+                return true;
+            }
+        }
+        return false;
+    }
     private Collection<ChessMove> pawnPieceMoves(ChessBoard board, ChessPosition myPosition) {
+        boolean initial_move = false;
+        if (board.getPiece(myPosition).getTeamColor() == ChessGame.TeamColor.BLACK && myPosition.getRow() == 7) {
+            initial_move = true;
+        }
+        if (board.getPiece(myPosition).getTeamColor() == ChessGame.TeamColor.WHITE && myPosition.getRow() == 2) {
+            initial_move = true;
+        }
+        int direction = 1;
+        if (board.getPiece(myPosition).getTeamColor() == ChessGame.TeamColor.BLACK) {
+            direction = -1;
+        }
         Collection<ChessMove> possibleMoves = new ArrayList<ChessMove>();
-        goodMove(board, myPosition, possibleMoves, myPosition.getRow(), myPosition.getColumn()+1);
-        return possibleMoves;
+        ChessPosition inFront = new ChessPosition(myPosition.getRow() + direction, myPosition.getColumn());
+        if (board.getPiece(inFront)== null) {
+            possibleMoves.add(new ChessMove(myPosition, inFront, null));
+        }
+        if (initial_move) {
+            ChessPosition doubleInFront = new ChessPosition(myPosition.getRow() + direction *2, myPosition.getColumn());
+            if (board.getPiece(doubleInFront)== null && board.getPiece(inFront) == null) {
+                possibleMoves.add(new ChessMove(myPosition, doubleInFront, null));
+            }
+        }
+        ChessPosition diagonalOne = new ChessPosition(myPosition.getRow() + direction, myPosition.getColumn() + 1);
+        ChessPosition diagonalTwo = new ChessPosition(myPosition.getRow() + direction, myPosition.getColumn() - 1);
+
+        if (enemyHere(board, myPosition, diagonalOne)) {
+            possibleMoves.add(new ChessMove(myPosition, diagonalOne, null));
+        }
+        if (enemyHere(board, myPosition, diagonalTwo)) {
+            possibleMoves.add(new ChessMove(myPosition, diagonalTwo, null));
+
+        }
+
+        Iterator<ChessMove> iter = possibleMoves.iterator();
+        Collection<ChessMove> possibleMoves2 = new ArrayList<ChessMove>();
+        while (iter.hasNext()) {
+            ChessMove move = iter.next();
+
+            if ((direction == 1 && move.getEndPosition().getRow() == 8) || (direction == -1 && move.getEndPosition().getRow() == 1)) {
+                possibleMoves2.add(new ChessMove(move.getStartPosition(), move.getEndPosition(), PieceType.QUEEN));
+                possibleMoves2.add(new ChessMove(move.getStartPosition(), move.getEndPosition(), PieceType.ROOK));
+                possibleMoves2.add(new ChessMove(move.getStartPosition(), move.getEndPosition(), PieceType.BISHOP));
+                possibleMoves2.add(new ChessMove(move.getStartPosition(), move.getEndPosition(), PieceType.KNIGHT));
+//                iter.remove();
+            } else {
+                possibleMoves2.add(move);
+            }
+        }
+
+        return possibleMoves2;
     }
 
     private boolean inBounds(int row, int col) {
