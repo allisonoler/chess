@@ -71,6 +71,76 @@ public class ChessPiece {
         return possibleMoves;
     }
 
+    private Collection<ChessMove> queenPieceMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> possibleMoves = new ArrayList<ChessMove>();
+        for (int i = myPosition.getRow() + 1, j = myPosition.getColumn() + 1; i<=8 && j<=8; i++, j++) {
+            if (goodMove(board, myPosition, possibleMoves, i, j)) {
+                break;
+            }
+        }
+        for (int i = myPosition.getRow() - 1, j = myPosition.getColumn() - 1; i>=1 && j>=1; i--, j--) {
+            if (goodMove(board, myPosition, possibleMoves, i, j)) {
+                break;
+            }
+        }
+        for (int i = myPosition.getRow() - 1, j = myPosition.getColumn() + 1; i>=1 && j<=8; i--, j++) {
+            if (goodMove(board, myPosition, possibleMoves, i, j)) {
+                break;
+            }
+        }
+        for (int i = myPosition.getRow() + 1, j = myPosition.getColumn() - 1; i<=8 && j>=1; i++, j--) {
+            if (goodMove(board, myPosition, possibleMoves, i, j)) {
+                break;
+            }
+        }
+        for (int i = myPosition.getRow() + 1, j = myPosition.getColumn(); i<=8 && j>=1; i++) {
+            if (goodMove(board, myPosition, possibleMoves, i, j)) {
+                break;
+            }
+        }
+        for (int i = myPosition.getRow() - 1, j = myPosition.getColumn(); i<=8 && j>=1; i--) {
+            if (goodMove(board, myPosition, possibleMoves, i, j)) {
+                break;
+            }
+        }
+        for (int i = myPosition.getRow(), j = myPosition.getColumn()+1; i<=8 && j>=1; j++) {
+            if (goodMove(board, myPosition, possibleMoves, i, j)) {
+                break;
+            }
+        }
+        for (int i = myPosition.getRow(), j = myPosition.getColumn()-1; i<=8 && j>=1; j--) {
+            if (goodMove(board, myPosition, possibleMoves, i, j)) {
+                break;
+            }
+        }
+        return possibleMoves;
+    }
+
+    private Collection<ChessMove> rookPieceMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> possibleMoves = new ArrayList<ChessMove>();
+        for (int i = myPosition.getRow() + 1, j = myPosition.getColumn(); i<=8 && j>=1; i++) {
+            if (goodMove(board, myPosition, possibleMoves, i, j)) {
+                break;
+            }
+        }
+        for (int i = myPosition.getRow() - 1, j = myPosition.getColumn(); i<=8 && j>=1; i--) {
+            if (goodMove(board, myPosition, possibleMoves, i, j)) {
+                break;
+            }
+        }
+        for (int i = myPosition.getRow(), j = myPosition.getColumn()+1; i<=8 && j>=1; j++) {
+            if (goodMove(board, myPosition, possibleMoves, i, j)) {
+                break;
+            }
+        }
+        for (int i = myPosition.getRow(), j = myPosition.getColumn()-1; i<=8 && j>=1; j--) {
+            if (goodMove(board, myPosition, possibleMoves, i, j)) {
+                break;
+            }
+        }
+        return possibleMoves;
+    }
+
     private Collection<ChessMove> kingPieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> possibleMoves = new ArrayList<ChessMove>();
         goodMove(board, myPosition, possibleMoves, myPosition.getRow()+1, myPosition.getColumn());
@@ -217,6 +287,12 @@ public class ChessPiece {
             }
             case PAWN -> {
                 possibleMoves = pawnPieceMoves(board, myPosition);
+            }
+            case QUEEN -> {
+                possibleMoves = queenPieceMoves(board, myPosition);
+            }
+            case ROOK -> {
+                possibleMoves = rookPieceMoves(board, myPosition);
             }
         }
         return possibleMoves;
