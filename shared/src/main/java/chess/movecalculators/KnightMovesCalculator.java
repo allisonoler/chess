@@ -1,12 +1,10 @@
-package chess.moveCalculators;
+package chess.movecalculators;
 
 import chess.ChessBoard;
 import chess.ChessMove;
 import chess.ChessPosition;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
 
 public class KnightMovesCalculator implements PieceMovesCalculator {
     @Override
