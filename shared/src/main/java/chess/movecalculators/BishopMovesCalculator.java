@@ -32,6 +32,5 @@ public class BishopMovesCalculator implements PieceMovesCalculator{
             }
         }
         return possibleMoves;
-        //been having a lot of problems
     }
 }
