@@ -14,6 +14,7 @@ public class ChessGame {
     private ChessBoard board;
 
 
+
     public ChessGame() {
         teamColor = TeamColor.WHITE;
         board = new ChessBoard();
@@ -134,6 +135,7 @@ public class ChessGame {
         return false;
 
     }
+
 
     /**
      * Determines if the given team is in checkmate
