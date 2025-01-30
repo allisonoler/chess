@@ -148,6 +148,10 @@ public class ChessGame {
         if (!isInCheck(teamColor)) {
             return false;
         }
+        return noMoves(teamColor);
+    }
+
+    private boolean noMoves(TeamColor teamColor) {
         for (int i = 1; i<9; i++) {
             for (int j =1; j<9; j++) {
                 if (board.getPiece(new ChessPosition(i,j))!=null&&board.getPiece(new ChessPosition(i,j)).getTeamColor()==teamColor) {
@@ -172,17 +176,7 @@ public class ChessGame {
         if (isInCheck(teamColor)) {
             return false;
         }
-        for (int i = 1; i<9; i++) {
-            for (int j =1; j<9; j++) {
-                if (board.getPiece(new ChessPosition(i,j))!=null&&board.getPiece(new ChessPosition(i,j)).getTeamColor()==teamColor) {
-                    Collection<ChessMove> possibleMoves = validMoves(new ChessPosition(i, j));
-                    if (possibleMoves != null && !possibleMoves.isEmpty()) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
+        return noMoves(teamColor);
     }
 
     /**
