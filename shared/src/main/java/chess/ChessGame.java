@@ -54,12 +54,11 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece currPiece = board.getPiece(startPosition);
-        Collection<ChessMove> potentialMoves = new ArrayList<ChessMove>();
         Collection<ChessMove> returnMoves = new ArrayList<ChessMove>();
         if (currPiece ==null ) {
             return null;
         }
-        potentialMoves = currPiece.pieceMoves(board, startPosition);
+        Collection<ChessMove> potentialMoves = currPiece.pieceMoves(board, startPosition);
         for (ChessMove move : potentialMoves) {
             ChessPiece start_piece = board.getPiece(move.getStartPosition());
             ChessPiece end_piece = board.getPiece(move.getEndPosition());
