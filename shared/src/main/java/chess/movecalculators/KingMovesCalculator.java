@@ -1,6 +1,7 @@
 package chess.movecalculators;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 
@@ -20,6 +21,7 @@ public class KingMovesCalculator implements PieceMovesCalculator {
         PieceMovesCalculator.goodMove(board, myPosition, new ChessPosition(myPosition.getRow(), myPosition.getColumn()+1),possibleMoves);
         PieceMovesCalculator.goodMove(board, myPosition, new ChessPosition(myPosition.getRow(), myPosition.getColumn()-1),possibleMoves);
         PieceMovesCalculator.goodMove(board, myPosition, new ChessPosition(myPosition.getRow(), myPosition.getColumn()),possibleMoves);
+
         return possibleMoves;
     }
 }

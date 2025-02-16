@@ -13,6 +13,8 @@ public class ChessMove {
         private ChessPosition endPosition;
         private ChessPiece.PieceType promotionPiece;
 
+        private boolean isCastle;
+
     @Override
     public String toString() {
         return "ChessMove{" +
@@ -45,6 +47,15 @@ public class ChessMove {
         this.startPosition = startPosition;
         this.endPosition = endPosition;
         this.promotionPiece = promotionPiece;
+        this.isCastle = false;
+    }
+
+    public void setCastle(boolean yesOrNo) {
+        isCastle = yesOrNo;
+    }
+
+    public boolean isCastle() {
+        return isCastle;
     }
 
     /**

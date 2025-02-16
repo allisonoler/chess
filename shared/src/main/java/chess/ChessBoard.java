@@ -10,8 +10,16 @@ import java.util.Arrays;
  */
 public class ChessBoard {
     private ChessPiece[][] positions;
+    public boolean whiteOneCastle;
+    public boolean whiteEightCastle;
+    public boolean blackOneCastle;
+    public boolean blackEightCastle;
     public ChessBoard() {
         positions = new ChessPiece[8][8];
+        whiteOneCastle = true;
+        whiteEightCastle = true;
+        blackEightCastle = true;
+        blackOneCastle = true;
     }
 
     /**
