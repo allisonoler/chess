@@ -12,7 +12,7 @@ public class MemoryGameDOA implements GameDOA {
     }
     @Override
     public void insertGame(GameData g) throws DataAccessException {
-
+        games.add(g);
     }
 
     @Override
@@ -28,5 +28,15 @@ public class MemoryGameDOA implements GameDOA {
     @Override
     public void updateGame(String id, GameData g) throws DataAccessException {
 
+    }
+
+    @Override
+    public void clear() {
+        games.clear();
+    }
+
+    @Override
+    public boolean empty() {
+        return games.isEmpty();
     }
 }

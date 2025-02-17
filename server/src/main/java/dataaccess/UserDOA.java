@@ -12,4 +12,6 @@ public interface UserDOA {
 
     void updateUser(String username, UserData u) throws DataAccessException;
 
+    void clear();
+
 }

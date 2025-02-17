@@ -13,4 +13,8 @@ public interface GameDOA {
     ArrayList<GameData> listGame(String id) throws DataAccessException;
 
     void updateGame(String id, GameData g) throws DataAccessException;
+
+    void clear();
+
+    boolean empty();
 }

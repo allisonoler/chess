@@ -11,7 +11,7 @@ public class MemoryUserDAO implements UserDOA{
     }
     @Override
     public void insertUser(UserData u) throws DataAccessException {
-
+        users.add(u);
     }
 
     @Override
@@ -21,11 +21,21 @@ public class MemoryUserDAO implements UserDOA{
 
     @Override
     public UserData readUser(String username) throws DataAccessException {
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).username() == username) {
+                return users.get(i);
+            }
+        }
         return null;
     }
 
     @Override
     public void updateUser(String username, UserData u) throws DataAccessException {
 
+    }
+
+    @Override
+    public void clear() {
+        users.clear();
     }
 }

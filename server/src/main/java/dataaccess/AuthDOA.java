@@ -6,9 +6,11 @@ import model.UserData;
 public interface AuthDOA {
     void insertAuth(AuthData u) throws DataAccessException;
 
-    void deleteAuth(String username) throws DataAccessException;
+    void deleteAuth(String authtoken) throws DataAccessException;
 
     AuthData getAuth(String authtoken) throws DataAccessException;
 
     void updateAuth(String username, AuthData u) throws DataAccessException;
+
+    void clear();
 }
