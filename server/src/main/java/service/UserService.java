@@ -5,6 +5,9 @@ import dataaccess.DataAccessException;
 import dataaccess.UserDOA;
 import model.AuthData;
 import model.UserData;
+import service.requestsresults.*;
+
+import java.util.UUID;
 
 public class UserService {
     private UserDOA userDOA;
@@ -13,8 +16,12 @@ public class UserService {
         this.userDOA = userDOA;
         this.authDOA = authDOA;
     }
+
+    private static String generateToken() {
+        return UUID.randomUUID().toString();
+    }
     public RegisterResult register(RegisterRequest registerRequest) {
-        String authToken = "hi";
+        String authToken = generateToken();
         try {
             UserData user = userDOA.readUser(registerRequest.username());
             if (user == null) {
@@ -29,7 +36,7 @@ public class UserService {
         return new RegisterResult(registerRequest.username(), authToken);
     }
     public LoginResult login(LoginRequest loginRequest) {
-        String authToken = "hi";
+        String authToken = generateToken();
         try {
             UserData user = userDOA.readUser(loginRequest.username());
             if (user!=null) {
@@ -40,5 +47,14 @@ public class UserService {
         }
         return new LoginResult(loginRequest.username(), authToken);
     }
-    public void logout(LogoutRequest logoutRequest) {}
+    public void logout(LogoutRequest logoutRequest) {
+        try {
+            AuthData authData = authDOA.getAuth(logoutRequest.authToken());
+            if (authData != null) {
+                authDOA.deleteAuth(logoutRequest.authToken());
+            }
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

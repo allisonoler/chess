@@ -1,9 +1,9 @@
-package service;
+package service.requestsresults;
 
 import model.GameData;
 
 import java.util.ArrayList;
 
-record ListResult(
+public record ListResult(
         ArrayList<GameData> games){
 }
