@@ -1,15 +1,16 @@
 package dataaccess;
 
 import model.GameData;
-import model.UserData;
 
-public class GameDOA {
+import java.util.ArrayList;
 
-    void insertGame(GameData g) throws DataAccessException {}
+public interface GameDOA {
 
-    void deleteGame(String id) throws DataAccessException {}
+    void insertGame(GameData g) throws DataAccessException;
 
-    GameData readGame(String id) throws DataAccessException {return null;}
+    void deleteGame(String id) throws DataAccessException;
 
-    void updateGame(String id, GameData g) throws DataAccessException {}
+    ArrayList<GameData> listGame(String id) throws DataAccessException;
+
+    void updateGame(String id, GameData g) throws DataAccessException;
 }
