@@ -10,11 +10,13 @@ public interface GameDOA {
 
     void deleteGame(String id) throws DataAccessException;
 
-    ArrayList<GameData> listGame(String id) throws DataAccessException;
+    ArrayList<GameData> listGame() throws DataAccessException;
 
-    void updateGame(String id, GameData g) throws DataAccessException;
+    void setGamePlayer(String id, String username, String playerColor) throws DataAccessException;
 
     void clear();
 
     boolean empty();
+
+    GameData getGame(String id);
 }

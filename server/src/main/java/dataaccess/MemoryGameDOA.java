@@ -17,17 +17,25 @@ public class MemoryGameDOA implements GameDOA {
 
     @Override
     public void deleteGame(String id) throws DataAccessException {
-
+        games.remove(getGame(id));
     }
 
     @Override
-    public ArrayList<GameData> listGame(String id) throws DataAccessException {
-        return null;
+    public ArrayList<GameData> listGame() throws DataAccessException {
+        return games;
     }
 
     @Override
-    public void updateGame(String id, GameData g) throws DataAccessException {
-
+    public void setGamePlayer(String id, String username, String playerColor) throws DataAccessException {
+        GameData game = getGame(id);
+        GameData newGame;
+        if (playerColor == "White") {
+            newGame = new GameData(id, username, game.blackUsername(), game.gameName(), game.game());
+        } else {
+            newGame = new GameData(id, game.whiteUsername(), username, game.gameName(), game.game());
+        }
+        deleteGame(id);
+        insertGame(newGame);
     }
 
     @Override
@@ -38,5 +46,15 @@ public class MemoryGameDOA implements GameDOA {
     @Override
     public boolean empty() {
         return games.isEmpty();
+    }
+
+    @Override
+    public GameData getGame(String gameID) {
+        for (int i = 0; i < games.size(); i++) {
+            if (games.get(i).gameID() == gameID) {
+                return games.get(i);
+            }
+        }
+        return null;
     }
 }
