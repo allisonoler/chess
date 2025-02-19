@@ -11,12 +11,15 @@ import java.util.ArrayList;
 public class GameService {
     GameDOA gameDOA;
     AuthDOA authDOA;
-    public GameService() {
-        this.gameDOA = new MemoryGameDOA();
-        this.authDOA = new MemoryAuthDOA();
+    private int curr_id;
+    public GameService(GameDOA gameDOA, AuthDOA authDOA) {
+        this.gameDOA = gameDOA;
+        this.authDOA = authDOA;
+        curr_id = 1;
     }
     public CreateResult create(CreateRequest createRequest) throws DataAccessException, UnauthorizedException {
-        String gameID = "1";
+        String gameID = Integer.toString(curr_id);
+        curr_id+=1;
         AuthData auth = authDOA.getAuth(createRequest.authToken());
         if (auth != null) {
             gameDOA.insertGame(new GameData(gameID, null, null, createRequest.gameName(), new ChessGame()));

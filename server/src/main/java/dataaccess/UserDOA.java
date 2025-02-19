@@ -14,4 +14,6 @@ public interface UserDOA {
 
     void clear();
 
+    boolean empty();
+
 }

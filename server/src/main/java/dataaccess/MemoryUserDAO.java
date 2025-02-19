@@ -38,4 +38,9 @@ public class MemoryUserDAO implements UserDOA{
     public void clear() {
         users.clear();
     }
+
+    @Override
+    public boolean empty() {
+        return users.isEmpty();
+    }
 }

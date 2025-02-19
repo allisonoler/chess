@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public class MemoryGameDOA implements GameDOA {
 
     private ArrayList<GameData> games;
+
     public MemoryGameDOA() {
         games = new ArrayList<GameData>();
     }
@@ -29,7 +30,7 @@ public class MemoryGameDOA implements GameDOA {
     public void setGamePlayer(String id, String username, String playerColor) throws DataAccessException {
         GameData game = getGame(id);
         GameData newGame;
-        if (playerColor == "White") {
+        if (playerColor == "white") {
             newGame = new GameData(id, username, game.blackUsername(), game.gameName(), game.game());
         } else {
             newGame = new GameData(id, game.whiteUsername(), username, game.gameName(), game.game());
@@ -51,7 +52,7 @@ public class MemoryGameDOA implements GameDOA {
     @Override
     public GameData getGame(String gameID) {
         for (int i = 0; i < games.size(); i++) {
-            if (games.get(i).gameID() == gameID) {
+            if (games.get(i).gameID().equals(gameID)) {
                 return games.get(i);
             }
         }
