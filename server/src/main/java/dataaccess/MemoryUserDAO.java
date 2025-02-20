@@ -22,7 +22,7 @@ public class MemoryUserDAO implements UserDOA{
     @Override
     public UserData readUser(String username) throws DataAccessException {
         for (int i = 0; i < users.size(); i++) {
-            if (users.get(i).username() == username) {
+            if (users.get(i).username().equals(username)) {
                 return users.get(i);
             }
         }

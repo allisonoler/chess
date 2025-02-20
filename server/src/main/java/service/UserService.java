@@ -35,12 +35,16 @@ public class UserService {
         }
         return new RegisterResult(registerRequest.username(), authToken);
     }
-    public LoginResult login(LoginRequest loginRequest) {
+    public LoginResult login(LoginRequest loginRequest) throws UnauthorizedException {
         String authToken = generateToken();
         try {
             UserData user = userDOA.readUser(loginRequest.username());
             if (user!=null) {
-                authDOA.insertAuth(new AuthData(loginRequest.username(), authToken));
+                if (user.password().equals(loginRequest.password())) {
+                    authDOA.insertAuth(new AuthData(loginRequest.username(), authToken));
+                } else {
+                    throw new UnauthorizedException("Unauthorized");
+                }
             }
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
@@ -49,10 +53,7 @@ public class UserService {
     }
     public void logout(LogoutRequest logoutRequest) {
         try {
-            AuthData authData = authDOA.getAuth(logoutRequest.authToken());
-            if (authData != null) {
-                authDOA.deleteAuth(logoutRequest.authToken());
-            }
+            authDOA.deleteAuth(logoutRequest.authToken());
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }

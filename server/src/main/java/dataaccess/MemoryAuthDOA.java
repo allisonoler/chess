@@ -24,7 +24,7 @@ public class MemoryAuthDOA implements AuthDOA{
 
     public AuthData getAuth(String authtoken) throws DataAccessException {
         for (int i = 0; i < auths.size(); i++) {
-            if (auths.get(i).authToken() == authtoken) {
+            if (auths.get(i).authToken().equals(authtoken)) {
                 return auths.get(i);
             }
         }
