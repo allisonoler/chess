@@ -15,11 +15,9 @@ import java.util.Objects;
 public class ChessPiece {
     private ChessGame.TeamColor teamColor;
      private ChessPiece.PieceType pieceType;
-     private boolean hasMoved;
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         teamColor = pieceColor;
         pieceType = type;
-        hasMoved = false;
     }
 
     /**
@@ -42,13 +40,6 @@ public class ChessPiece {
 
     }
 
-    public boolean hasMoved() {
-        return hasMoved;
-    }
-
-    public void setHasMoved(boolean yesorno) {
-        hasMoved = yesorno;
-    }
 
     /**
      * @return which type of chess piece this piece is

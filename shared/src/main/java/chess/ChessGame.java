@@ -60,15 +60,15 @@ public class ChessGame {
         }
         Collection<ChessMove> potentialMoves = currPiece.pieceMoves(board, startPosition);
         for (ChessMove move : potentialMoves) {
-            ChessPiece start_piece = board.getPiece(move.getStartPosition());
-            ChessPiece end_piece = board.getPiece(move.getEndPosition());
+            ChessPiece startPiece = board.getPiece(move.getStartPosition());
+            ChessPiece endPiece = board.getPiece(move.getEndPosition());
             board.addPiece(startPosition, null);
-            board.addPiece(move.getEndPosition(), start_piece);
-            if (!isInCheck(start_piece.getTeamColor())) {
+            board.addPiece(move.getEndPosition(), startPiece);
+            if (!isInCheck(startPiece.getTeamColor())) {
                 returnMoves.add(move);
             }
-            board.addPiece(startPosition, start_piece);
-            board.addPiece(move.getEndPosition(), end_piece);
+            board.addPiece(startPosition, startPiece);
+            board.addPiece(move.getEndPosition(), endPiece);
         }
         return returnMoves;
     }
