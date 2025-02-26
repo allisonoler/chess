@@ -11,10 +11,12 @@ public class ClearTest {
     public void positiveTest() throws DataAccessException {
         GameDOA gameDOA = new MemoryGameDOA();
         UserDOA userDOA = new MemoryUserDAO();
+        AuthDOA authDOA = new MemoryAuthDOA();
         gameDOA.insertGame(new GameData("55", "allison", "steve", "lol", new ChessGame()));
-        ClearService clearService = new ClearService(gameDOA, userDOA);
+        ClearService clearService = new ClearService(gameDOA, userDOA, authDOA);
         clearService.clear();
         assertTrue(gameDOA.empty());
         assertTrue(userDOA.empty());
+        assertTrue(authDOA.empty());
     }
 }

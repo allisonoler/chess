@@ -15,11 +15,6 @@ public class MemoryUserDAO implements UserDOA{
     }
 
     @Override
-    public void deleteUser(String username) throws DataAccessException {
-
-    }
-
-    @Override
     public UserData readUser(String username) throws DataAccessException {
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).username().equals(username)) {
@@ -28,12 +23,6 @@ public class MemoryUserDAO implements UserDOA{
         }
         return null;
     }
-
-    @Override
-    public void updateUser(String username, UserData u) throws DataAccessException {
-
-    }
-
     @Override
     public void clear() {
         users.clear();

@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class CreateTest {
     @Test
-    public void positiveTest() throws DataAccessException, UnauthorizedException {
+    public void positiveTest() throws DataAccessException, UnauthorizedException, ForbiddenException, BadRequestException {
         UserDOA userDOA = new MemoryUserDAO();
         AuthDOA authDOA = new MemoryAuthDOA();
         GameDOA gameDOA = new MemoryGameDOA();

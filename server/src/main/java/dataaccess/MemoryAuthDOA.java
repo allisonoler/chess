@@ -32,12 +32,12 @@ public class MemoryAuthDOA implements AuthDOA{
     }
 
     @Override
-    public void updateAuth(String username, AuthData u) throws DataAccessException {
-
+    public void clear() {
+        auths.clear();
     }
 
     @Override
-    public void clear() {
-        auths.clear();
+    public boolean empty() {
+        return auths.isEmpty();
     }
 }

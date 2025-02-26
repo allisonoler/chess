@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class LogoutTest {
     @Test
-    public void positiveTest() throws DataAccessException, UnauthorizedException {
+    public void positiveTest() throws DataAccessException, UnauthorizedException, ForbiddenException, BadRequestException {
         UserDOA userDOA = new MemoryUserDAO();
         AuthDOA authDOA = new MemoryAuthDOA();
         UserService userService = new UserService(userDOA, authDOA);
@@ -21,7 +21,7 @@ public class LogoutTest {
     }
 
     @Test
-    public void negativeTest() throws DataAccessException, UnauthorizedException {
+    public void negativeTest() throws DataAccessException, UnauthorizedException, ForbiddenException, BadRequestException {
         UserDOA userDOA = new MemoryUserDAO();
         AuthDOA authDOA = new MemoryAuthDOA();
         UserService userService = new UserService(userDOA, authDOA);

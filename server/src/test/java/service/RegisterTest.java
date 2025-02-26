@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class RegisterTest {
     @Test
-    public void positiveTest() throws DataAccessException {
+    public void positiveTest() throws DataAccessException, ForbiddenException, BadRequestException {
         UserDOA userDOA = new MemoryUserDAO();
         AuthDOA authDOA = new MemoryAuthDOA();
         UserService userService = new UserService(userDOA, authDOA);
@@ -21,7 +21,7 @@ public class RegisterTest {
     }
 
     @Test
-    public void negativeTest() throws DataAccessException {
+    public void negativeTest() throws DataAccessException, ForbiddenException, BadRequestException {
         UserDOA userDOA = new MemoryUserDAO();
         AuthDOA authDOA = new MemoryAuthDOA();
         UserService userService = new UserService(userDOA, authDOA);

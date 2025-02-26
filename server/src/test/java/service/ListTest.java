@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ListTest {
     @Test
-    public void positiveTest() throws DataAccessException, UnauthorizedException {
+    public void positiveTest() throws DataAccessException, UnauthorizedException, ForbiddenException, BadRequestException {
         UserDOA userDOA = new MemoryUserDAO();
         AuthDOA authDOA = new MemoryAuthDOA();
         GameDOA gameDOA = new MemoryGameDOA();
@@ -23,7 +23,7 @@ public class ListTest {
         CreateResult createResult = gameService.create(new CreateRequest(loginResult.authToken(), "game1"));
         CreateResult createResul2 = gameService.create(new CreateRequest(loginResult.authToken(), "game2"));
         assertNotNull(gameDOA.getGame(createResult.gameID()));
-        gameService.join(new JoinRequest(loginResult.authToken(), "white", "1"));
+        gameService.join(new JoinRequest(loginResult.authToken(), "WHITE", "1"));
         ArrayList<GameData> exampleGames = new ArrayList<GameData>();
         exampleGames.add(gameDOA.getGame(createResul2.gameID()));
         exampleGames.add(gameDOA.getGame(createResult.gameID()));

@@ -20,8 +20,11 @@ public class UserService {
     private static String generateToken() {
         return UUID.randomUUID().toString();
     }
-    public RegisterResult register(RegisterRequest registerRequest) {
+    public RegisterResult register(RegisterRequest registerRequest) throws ForbiddenException, BadRequestException {
         String authToken = generateToken();
+        if (registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null) {
+            throw new BadRequestException("bad request");
+        }
         try {
             UserData user = userDOA.readUser(registerRequest.username());
             if (user == null) {
@@ -29,13 +32,15 @@ public class UserService {
 
                 authDOA.insertAuth(new AuthData(registerRequest.username(), authToken));
 
+            } else {
+                throw new ForbiddenException("Forbidden");
             }
         } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+            throw new BadRequestException(e.getMessage());
         }
         return new RegisterResult(registerRequest.username(), authToken);
     }
-    public LoginResult login(LoginRequest loginRequest) throws UnauthorizedException {
+    public LoginResult login(LoginRequest loginRequest) throws UnauthorizedException, BadRequestException {
         String authToken = generateToken();
         try {
             UserData user = userDOA.readUser(loginRequest.username());
@@ -46,16 +51,19 @@ public class UserService {
                     throw new UnauthorizedException("Unauthorized");
                 }
             }
+            else {
+                throw new UnauthorizedException("Unauthorized");
+            }
         } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+            throw new BadRequestException(e.getMessage());
         }
         return new LoginResult(loginRequest.username(), authToken);
     }
-    public void logout(LogoutRequest logoutRequest) {
+    public void logout(LogoutRequest logoutRequest) throws DataAccessException {
         try {
             authDOA.deleteAuth(logoutRequest.authToken());
         } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(e.getMessage());
         }
     }
 }

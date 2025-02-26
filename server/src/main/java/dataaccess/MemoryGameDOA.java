@@ -30,7 +30,10 @@ public class MemoryGameDOA implements GameDOA {
     public void setGamePlayer(String id, String username, String playerColor) throws DataAccessException {
         GameData game = getGame(id);
         GameData newGame;
-        if (playerColor == "white") {
+        if (playerColor == null) {
+            throw new DataAccessException("bad request");
+        }
+        if (playerColor.equals("WHITE")) {
             newGame = new GameData(id, username, game.blackUsername(), game.gameName(), game.game());
         } else {
             newGame = new GameData(id, game.whiteUsername(), username, game.gameName(), game.game());

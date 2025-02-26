@@ -2,10 +2,7 @@ package server;
 
 import dataaccess.*;
 import org.eclipse.jetty.util.log.Log;
-import service.ClearService;
-import service.GameService;
-import service.UnauthorizedException;
-import service.UserService;
+import service.*;
 import service.requestsresults.*;
 import spark.*;
 import com.google.gson.Gson;
@@ -18,7 +15,7 @@ public class Server {
     UserDOA userDOA = new MemoryUserDAO();
     AuthDOA authDOA = new MemoryAuthDOA();
     UserService userService = new UserService(userDOA, authDOA);
-    ClearService clearService = new ClearService(gameDOA, userDOA);
+    ClearService clearService = new ClearService(gameDOA, userDOA, authDOA);
 
     GameService gameService = new GameService(gameDOA, authDOA);
 
@@ -30,66 +27,62 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-//        Spark.get("/login", (request, response) ->"bet you wish you could login");
         Spark.post("/session", this::loginHandler);
         Spark.post("/user", this::registerHandler);
         Spark.delete("/db", this::clearHandler);
         Spark.delete("/session", this::logoutHandler);
         Spark.post("/game", this::createHandler);
+        Spark.get("/game", this::listHandler);
+        Spark.put("/game", this::joinHandler);
 
-//        Spark.get("/pet", this::listPets);
-//        Spark.post("/session", (request, response) -> "weiiiiii");
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
-        Spark.init();
+//        Spark.init();
 
         Spark.awaitInitialization();
         return Spark.port();
     }
 
     private Object clearHandler(Request req, Response res) {
-//        var clearRequest = new Gson().fromJson(req.body(), Clear.class);
-//        pet = service.addPet(pet);
-//        webSocketHandler.makeNoise(pet.name(), pet.sound());
-//        return new Gson().toJson(pet);
         clearService.clear();
         res.status(200);
         res.type("application/json");
-//        return new Gson().toJson("hi");
         return "";
     }
 
     private Object registerHandler(Request req, Response res) {
         var registerRequest = new Gson().fromJson(req.body(), RegisterRequest.class);
-//        pet = service.addPet(pet);
-//        webSocketHandler.makeNoise(pet.name(), pet.sound());
-//        return new Gson().toJson(pet);
-        RegisterResult registerResult = userService.register(registerRequest);
-        res.status(200);
+        try {
+            RegisterResult registerResult = userService.register(registerRequest);
+            res.status(200);
+            res.body(new Gson().toJson(registerResult));
+        } catch (ForbiddenException e) {
+            res.status(403);
+            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "forbidden"), "success", false)));
+        } catch (BadRequestException e) {
+            res.status(400);
+            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false)));
+        }
         res.type("application/json");
-//        return new Gson().toJson("hi");
-        return new Gson().toJson(registerResult);
+        return res.body();
     }
 
     private Object loginHandler(Request req, Response res) {
         var loginRequest = new Gson().fromJson(req.body(), LoginRequest.class);
-//        pet = service.addPet(pet);
-//        webSocketHandler.makeNoise(pet.name(), pet.sound());
-//        return new Gson().toJson(pet);
         try {
             LoginResult loginResult = userService.login(loginRequest);
             res.status(200);
-            res.type("application/json");
-//        return new Gson().toJson("hi");
-            return new Gson().toJson(loginResult);
+            res.body(new Gson().toJson(loginResult));
         } catch (UnauthorizedException e) {
             res.status(401);
-            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "unauthorized"), "success", false)));
-            res.type("application/json");
+            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false)));
             return res.body();
-
+        } catch (BadRequestException e) {
+            res.status(400);
+            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false)));
         }
-
+        res.type("application/json");
+        return res.body();
     }
 
     private Object logoutHandler(Request req, Response res) {
@@ -98,29 +91,28 @@ public class Server {
             if (validateAuthToken(logoutRequest.authToken())) {
                 res.status(200);
                 userService.logout(logoutRequest);
+                res.body("");
             } else {
                 res.status(401);
                 res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "unauthorized"), "success", false)));
-                res.type("application/json");
-                return res.body();
             }
         } catch (DataAccessException e) {
             res.status(500);
+            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false)));
         }
-//        pet = service.addPet(pet);
-//        webSocketHandler.makeNoise(pet.name(), pet.sound());
-//        return new Gson().toJson(pet);
+
         res.type("application/json");
-//        return new Gson().toJson("hi");
-        return "";
+        return res.body();
     }
 
     private Object createHandler(Request req, Response res) {
         var createRequest = new Gson().fromJson(req.body(), CreateRequest.class);
+        String authToken = req.headers("authorization").toString();
         try {
-            if (validateAuthToken(createRequest.authToken())) {
+            if (validateAuthToken(authToken)){
                 res.status(200);
-                gameService.create(createRequest);
+                CreateResult createResult = gameService.create(createRequest);
+                return new Gson().toJson(createResult);
             } else {
                 res.status(401);
                 res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "unauthorized"), "success", false)));
@@ -131,6 +123,69 @@ public class Server {
             res.status(500);
         } catch (UnauthorizedException e) {
             throw new RuntimeException(e);
+        }
+//        pet = service.addPet(pet);
+//        webSocketHandler.makeNoise(pet.name(), pet.sound());
+//        return new Gson().toJson(pet);
+        res.type("application/json");
+//        return new Gson().toJson("hi");
+        return "";
+    }
+
+    private Object listHandler(Request req, Response res) {
+        var listRequest = new Gson().fromJson(req.body(), ListRequest.class);
+        String authToken = req.headers("authorization").toString();
+        try {
+            if (validateAuthToken(authToken)){
+                res.status(200);
+                ListResult listResult = gameService.list(listRequest);
+                return new Gson().toJson(listResult);
+            } else {
+                res.status(401);
+                res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "unauthorized"), "success", false)));
+                res.type("application/json");
+                return res.body();
+            }
+        } catch (DataAccessException e) {
+            res.status(500);
+        } catch (UnauthorizedException e) {
+            throw new RuntimeException(e);
+        }
+//        pet = service.addPet(pet);
+//        webSocketHandler.makeNoise(pet.name(), pet.sound());
+//        return new Gson().toJson(pet);
+        res.type("application/json");
+//        return new Gson().toJson("hi");
+        return "";
+    }
+
+    private Object joinHandler(Request req, Response res) {
+        var joinRequest = new Gson().fromJson(req.body(), JoinRequest.class);
+        String authToken = req.headers("authorization").toString();
+        var joinRequest2 = new JoinRequest(authToken, joinRequest.playerColor(), joinRequest.gameID());
+        try {
+            if (validateAuthToken(authToken)){
+                res.status(200);
+                gameService.join(joinRequest2);
+                return "";
+            } else {
+                res.status(401);
+                res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "unauthorized"), "success", false)));
+                res.type("application/json");
+                return res.body();
+            }
+        } catch (DataAccessException e) {
+            res.status(500);
+        } catch (UnauthorizedException e) {
+            throw new RuntimeException(e);
+        } catch (BadRequestException e) {
+            res.status(400);
+            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false)));
+            return res.body();
+        } catch (ForbiddenException e) {
+            res.status(403);
+            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false)));
+            return res.body();
         }
 //        pet = service.addPet(pet);
 //        webSocketHandler.makeNoise(pet.name(), pet.sound());

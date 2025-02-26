@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class JoinTest {
     @Test
-    public void positiveTest() throws DataAccessException, UnauthorizedException {
+    public void positiveTest() throws DataAccessException, UnauthorizedException, ForbiddenException, BadRequestException {
         UserDOA userDOA = new MemoryUserDAO();
         AuthDOA authDOA = new MemoryAuthDOA();
         GameDOA gameDOA = new MemoryGameDOA();
@@ -18,7 +18,7 @@ public class JoinTest {
         LoginResult loginResult = userService.login(new LoginRequest("allison", "chocolate"));
         CreateResult createResult = gameService.create(new CreateRequest(loginResult.authToken(), "game1"));
         assertNotNull(gameDOA.getGame(createResult.gameID()));
-        gameService.join(new JoinRequest(loginResult.authToken(), "white", "1"));
+        gameService.join(new JoinRequest(loginResult.authToken(), "WHITE", "1"));
         assertEquals(gameDOA.getGame("1").whiteUsername(), "allison");
     }
 
