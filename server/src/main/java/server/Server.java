@@ -92,16 +92,12 @@ public class Server {
         return res.body();
     }
 
-    private Object logoutHandler(Request req, Response res) throws DataAccessException {
+    private Object logoutHandler(Request req, Response res) throws DataAccessException, UnauthorizedException {
         LogoutRequest logoutRequest = new LogoutRequest(req.headers("authorization").toString());
-        if (validateAuthToken(logoutRequest.authToken())) {
-            res.status(200);
-            userService.logout(logoutRequest);
-            res.body("");
-        } else {
-            res.status(401);
-            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "unauthorized"), "success", false)));
-        }
+        validateAuthToken(logoutRequest.authToken());
+        res.status(200);
+        userService.logout(logoutRequest);
+        res.body("");
         res.type("application/json");
         return res.body();
     }
@@ -109,55 +105,38 @@ public class Server {
     private Object createHandler(Request req, Response res) throws UnauthorizedException, DataAccessException {
         var createRequest = new Gson().fromJson(req.body(), CreateRequest.class);
         String authToken = req.headers("authorization").toString();
-        if (validateAuthToken(authToken)){
-            res.status(200);
-            CreateResult createResult = gameService.create(createRequest);
-            return new Gson().toJson(createResult);
-        } else {
-            res.status(401);
-            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "unauthorized"), "success", false)));
-            res.type("application/json");
-            return res.body();
-        }
+        validateAuthToken(authToken);
+        res.status(200);
+        CreateResult createResult = gameService.create(createRequest);
+        return new Gson().toJson(createResult);
+
     }
 
     private Object listHandler(Request req, Response res) throws DataAccessException, UnauthorizedException {
         var listRequest = new Gson().fromJson(req.body(), ListRequest.class);
         String authToken = req.headers("authorization").toString();
-        if (validateAuthToken(authToken)){
-            res.status(200);
-            ListResult listResult = gameService.list(listRequest);
-            return new Gson().toJson(listResult);
-        } else {
-            res.status(401);
-            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "unauthorized"), "success", false)));
-            res.type("application/json");
-            return res.body();
-        }
+        validateAuthToken(authToken);
+        res.status(200);
+        ListResult listResult = gameService.list(listRequest);
+        return new Gson().toJson(listResult);
     }
 
     private Object joinHandler(Request req, Response res) throws DataAccessException, ForbiddenException, UnauthorizedException, BadRequestException {
         var joinRequest = new Gson().fromJson(req.body(), JoinRequest.class);
         String authToken = req.headers("authorization").toString();
         var joinRequest2 = new JoinRequest(authToken, joinRequest.playerColor(), joinRequest.gameID());
-        if (validateAuthToken(authToken)){
-            res.status(200);
-            gameService.join(joinRequest2);
-            return "";
-        } else {
-            res.status(401);
-            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "unauthorized"), "success", false)));
-            res.type("application/json");
-            return res.body();
-        }
+        validateAuthToken(authToken);
+        res.status(200);
+        gameService.join(joinRequest2);
+        return "";
     }
 
-    private boolean validateAuthToken(String authToken) throws DataAccessException {
+    private boolean validateAuthToken(String authToken) throws DataAccessException, UnauthorizedException {
         if (authDOA.getAuth(authToken)!=null) {
             return true;
         }
         else {
-            return false;
+            throw new UnauthorizedException("Not authorized");
         }
     }
 
