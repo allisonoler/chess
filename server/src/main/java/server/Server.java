@@ -25,6 +25,7 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
+
         Spark.post("/session", this::loginHandler);
         Spark.post("/user", this::registerHandler);
         Spark.delete("/db", this::clearHandler);
@@ -32,6 +33,11 @@ public class Server {
         Spark.post("/game", this::createHandler);
         Spark.get("/game", this::listHandler);
         Spark.put("/game", this::joinHandler);
+
+        Spark.exception(UnauthorizedException.class, this::unauthorizedExceptionHandler);
+        Spark.exception(ForbiddenException.class, this::forbiddenExceptionHandler);
+        Spark.exception(DataAccessException.class, this::dataAccessExceptionHandler);
+        Spark.exception(BadRequestException.class, this::badRequestExceptionHandler);
 
         Spark.awaitInitialization();
         return Spark.port();
@@ -44,137 +50,106 @@ public class Server {
         return "";
     }
 
-    private Object registerHandler(Request req, Response res) {
+    private Object unauthorizedExceptionHandler(UnauthorizedException e, Request req, Response res) {
+        res.status(401);
+        res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false)));
+        return res.body();
+    }
+
+    private Object forbiddenExceptionHandler(ForbiddenException e, Request req, Response res) {
+        res.status(403);
+        res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "forbidden"), "success", false)));
+        return res.body();
+    }
+
+    private Object badRequestExceptionHandler(BadRequestException e, Request req, Response res) {
+        res.status(400);
+        res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false)));
+        return res.body();
+    }
+
+    private Object dataAccessExceptionHandler(DataAccessException e, Request req, Response res) {
+        res.status(500);
+        res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false)));
+        return res.body();
+    }
+
+    private Object registerHandler(Request req, Response res) throws ForbiddenException, BadRequestException {
         var registerRequest = new Gson().fromJson(req.body(), RegisterRequest.class);
-        try {
-            RegisterResult registerResult = userService.register(registerRequest);
-            res.status(200);
-            res.body(new Gson().toJson(registerResult));
-        } catch (ForbiddenException e) {
-            res.status(403);
-            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "forbidden"), "success", false)));
-        } catch (BadRequestException e) {
-            res.status(400);
-            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false)));
-        }
+        RegisterResult registerResult = userService.register(registerRequest);
+        res.status(200);
+        res.body(new Gson().toJson(registerResult));
         res.type("application/json");
         return res.body();
     }
 
-    private Object loginHandler(Request req, Response res) {
+    private Object loginHandler(Request req, Response res) throws UnauthorizedException, BadRequestException {
         var loginRequest = new Gson().fromJson(req.body(), LoginRequest.class);
-        try {
-            LoginResult loginResult = userService.login(loginRequest);
-            res.status(200);
-            res.body(new Gson().toJson(loginResult));
-        } catch (UnauthorizedException e) {
-            res.status(401);
-            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false)));
-            return res.body();
-        } catch (BadRequestException e) {
-            res.status(400);
-            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false)));
-        }
+        LoginResult loginResult = userService.login(loginRequest);
+        res.status(200);
+        res.body(new Gson().toJson(loginResult));
         res.type("application/json");
         return res.body();
     }
 
-    private Object logoutHandler(Request req, Response res) {
+    private Object logoutHandler(Request req, Response res) throws DataAccessException {
         LogoutRequest logoutRequest = new LogoutRequest(req.headers("authorization").toString());
-        try {
-            if (validateAuthToken(logoutRequest.authToken())) {
-                res.status(200);
-                userService.logout(logoutRequest);
-                res.body("");
-            } else {
-                res.status(401);
-                res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "unauthorized"), "success", false)));
-            }
-        } catch (DataAccessException e) {
-            res.status(500);
-            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false)));
+        if (validateAuthToken(logoutRequest.authToken())) {
+            res.status(200);
+            userService.logout(logoutRequest);
+            res.body("");
+        } else {
+            res.status(401);
+            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "unauthorized"), "success", false)));
         }
-
         res.type("application/json");
         return res.body();
     }
 
-    private Object createHandler(Request req, Response res) {
+    private Object createHandler(Request req, Response res) throws UnauthorizedException, DataAccessException {
         var createRequest = new Gson().fromJson(req.body(), CreateRequest.class);
         String authToken = req.headers("authorization").toString();
-        try {
-            if (validateAuthToken(authToken)){
-                res.status(200);
-                CreateResult createResult = gameService.create(createRequest);
-                return new Gson().toJson(createResult);
-            } else {
-                res.status(401);
-                res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "unauthorized"), "success", false)));
-                res.type("application/json");
-                return res.body();
-            }
-        } catch (DataAccessException e) {
-            res.status(500);
-        } catch (UnauthorizedException e) {
-            throw new RuntimeException(e);
+        if (validateAuthToken(authToken)){
+            res.status(200);
+            CreateResult createResult = gameService.create(createRequest);
+            return new Gson().toJson(createResult);
+        } else {
+            res.status(401);
+            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "unauthorized"), "success", false)));
+            res.type("application/json");
+            return res.body();
         }
-        res.type("application/json");
-        return "";
     }
 
-    private Object listHandler(Request req, Response res) {
+    private Object listHandler(Request req, Response res) throws DataAccessException, UnauthorizedException {
         var listRequest = new Gson().fromJson(req.body(), ListRequest.class);
         String authToken = req.headers("authorization").toString();
-        try {
-            if (validateAuthToken(authToken)){
-                res.status(200);
-                ListResult listResult = gameService.list(listRequest);
-                return new Gson().toJson(listResult);
-            } else {
-                res.status(401);
-                res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "unauthorized"), "success", false)));
-                res.type("application/json");
-                return res.body();
-            }
-        } catch (DataAccessException e) {
-            res.status(500);
-        } catch (UnauthorizedException e) {
-            throw new RuntimeException(e);
+        if (validateAuthToken(authToken)){
+            res.status(200);
+            ListResult listResult = gameService.list(listRequest);
+            return new Gson().toJson(listResult);
+        } else {
+            res.status(401);
+            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "unauthorized"), "success", false)));
+            res.type("application/json");
+            return res.body();
         }
-        res.type("application/json");
-        return "";
     }
 
-    private Object joinHandler(Request req, Response res) {
+    private Object joinHandler(Request req, Response res) throws DataAccessException, ForbiddenException, UnauthorizedException, BadRequestException {
         var joinRequest = new Gson().fromJson(req.body(), JoinRequest.class);
         String authToken = req.headers("authorization").toString();
         var joinRequest2 = new JoinRequest(authToken, joinRequest.playerColor(), joinRequest.gameID());
-        try {
-            if (validateAuthToken(authToken)){
-                res.status(200);
-                gameService.join(joinRequest2);
-                return "";
-            } else {
-                res.status(401);
-                res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "unauthorized"), "success", false)));
-                res.type("application/json");
-                return res.body();
-            }
-        } catch (DataAccessException e) {
-            res.status(500);
-        } catch (UnauthorizedException e) {
-            throw new RuntimeException(e);
-        } catch (BadRequestException e) {
-            res.status(400);
-            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false)));
-            return res.body();
-        } catch (ForbiddenException e) {
-            res.status(403);
-            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false)));
+        if (validateAuthToken(authToken)){
+            res.status(200);
+            gameService.join(joinRequest2);
+            return "";
+        } else {
+            res.status(401);
+            res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", "unauthorized"), "success", false)));
+            res.type("application/json");
             return res.body();
         }
-        res.type("application/json");
-        return "";
     }
 
     private boolean validateAuthToken(String authToken) throws DataAccessException {
