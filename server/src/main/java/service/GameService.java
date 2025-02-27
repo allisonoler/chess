@@ -34,7 +34,8 @@ public class GameService {
             throw new BadRequestException("game not found");
         }
         GameData game = gameDOA.getGame(joinRequest.gameID());
-        if (game.whiteUsername()!= null && joinRequest.playerColor().equals("WHITE") || game.blackUsername()!= null && joinRequest.playerColor().equals("BLACK")) {
+        if (game.whiteUsername()!= null && joinRequest.playerColor().equals("WHITE") || game.blackUsername()!= null &&
+                joinRequest.playerColor().equals("BLACK")) {
             throw new ForbiddenException("can't steal team");
         }
         if (auth != null) {

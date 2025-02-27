@@ -81,7 +81,8 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         Collection<ChessMove> possibleMoves = validMoves(move.getStartPosition());
-        if (possibleMoves == null || possibleMoves.isEmpty() || board.getPiece(move.getStartPosition()) == null || board.getPiece(move.getStartPosition()).getTeamColor()!=teamColor) {
+        if (possibleMoves == null || possibleMoves.isEmpty() || board.getPiece(move.getStartPosition()) == null ||
+                board.getPiece(move.getStartPosition()).getTeamColor()!=teamColor) {
             throw new InvalidMoveException();
         }
         if (!possibleMoves.contains(move)) {
