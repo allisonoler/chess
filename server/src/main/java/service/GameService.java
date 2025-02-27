@@ -44,13 +44,8 @@ public class GameService {
         }
     }
     public ListResult list(ListRequest listRequest) throws DataAccessException, UnauthorizedException {
-//        AuthData auth = authDOA.getAuth(listRequest.authToken());
         ArrayList<GameData> games;
-//        if (auth != null) {
         games = gameDOA.listGame();
-//        } else {
-//            throw new UnauthorizedException("Not registered");
-//        }
         return new ListResult(games);
     }
 }

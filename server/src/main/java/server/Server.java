@@ -1,14 +1,12 @@
 package server;
 
 import dataaccess.*;
-import org.eclipse.jetty.util.log.Log;
 import service.*;
 import service.requestsresults.*;
 import spark.*;
 import com.google.gson.Gson;
 
 import java.util.Map;
-//import excepti/*/on.ResponseException;
 
 public class Server {
     GameDOA gameDOA = new MemoryGameDOA();
@@ -34,10 +32,6 @@ public class Server {
         Spark.post("/game", this::createHandler);
         Spark.get("/game", this::listHandler);
         Spark.put("/game", this::joinHandler);
-
-
-        //This line initializes the server and can be removed once you have a functioning endpoint 
-//        Spark.init();
 
         Spark.awaitInitialization();
         return Spark.port();
@@ -124,11 +118,7 @@ public class Server {
         } catch (UnauthorizedException e) {
             throw new RuntimeException(e);
         }
-//        pet = service.addPet(pet);
-//        webSocketHandler.makeNoise(pet.name(), pet.sound());
-//        return new Gson().toJson(pet);
         res.type("application/json");
-//        return new Gson().toJson("hi");
         return "";
     }
 
@@ -151,11 +141,7 @@ public class Server {
         } catch (UnauthorizedException e) {
             throw new RuntimeException(e);
         }
-//        pet = service.addPet(pet);
-//        webSocketHandler.makeNoise(pet.name(), pet.sound());
-//        return new Gson().toJson(pet);
         res.type("application/json");
-//        return new Gson().toJson("hi");
         return "";
     }
 
@@ -187,11 +173,7 @@ public class Server {
             res.body(new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false)));
             return res.body();
         }
-//        pet = service.addPet(pet);
-//        webSocketHandler.makeNoise(pet.name(), pet.sound());
-//        return new Gson().toJson(pet);
         res.type("application/json");
-//        return new Gson().toJson("hi");
         return "";
     }
 
