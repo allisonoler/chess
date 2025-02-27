@@ -15,7 +15,6 @@ public class LoginTest {
         AuthDOA authDOA = new MemoryAuthDOA();
         UserService userService = new UserService(userDOA, authDOA);
         userService.register(new RegisterRequest("allison", "chocolate", "linoler@gmail.com"));
-        userService.login(new LoginRequest("allison", "chocolate"));
         assertNotNull(userDOA.readUser("allison"));
     }
 

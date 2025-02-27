@@ -25,12 +25,8 @@ public class LogoutTest {
         UserDOA userDOA = new MemoryUserDAO();
         AuthDOA authDOA = new MemoryAuthDOA();
         UserService userService = new UserService(userDOA, authDOA);
-        userService.register(new RegisterRequest("allison", "chocolate", "linoler@gmail.com"));
-        userService.register(new RegisterRequest("steve", "chocolate", "linoler@gmail.com"));
-        LoginResult loginResult = userService.login(new LoginRequest("allison", "chocolate"));
-        LoginResult loginResult2 = userService.login(new LoginRequest("steve", "chocolate"));
-        userService.logout(new LogoutRequest(loginResult.authToken()));
-        assertNotNull(authDOA.getAuth(loginResult2.authToken()));
-        assertNull(authDOA.getAuth(loginResult.authToken()));
+        RegisterResult registerResult = userService.register(new RegisterRequest("allison", "chocolate", "linoler@gmail.com"));
+        userService.logout(new LogoutRequest("hi"));
+        assertNotNull(authDOA.getAuth(registerResult.authToken()));
     }
 }

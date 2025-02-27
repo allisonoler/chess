@@ -20,12 +20,7 @@ public class GameService {
     public CreateResult create(CreateRequest createRequest) throws DataAccessException, UnauthorizedException {
         String gameID = Integer.toString(currId);
         currId +=1;
-//        AuthData auth = authDOA.getAuth(createRequest.authToken());
-//        if (auth != null) {
         gameDOA.insertGame(new GameData(gameID, null, null, createRequest.gameName(), new ChessGame()));
-//        } else {
-//            throw new UnauthorizedException("Not registered");
-//        }
         return new CreateResult(gameID);
     }
     public void join(JoinRequest joinRequest) throws UnauthorizedException, DataAccessException, BadRequestException, ForbiddenException {
