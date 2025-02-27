@@ -21,11 +21,9 @@ public class Server {
 
         Spark.port(desiredPort);
 
-
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-
         Spark.post("/session", this::loginHandler);
         Spark.post("/user", this::registerHandler);
         Spark.delete("/db", this::clearHandler);

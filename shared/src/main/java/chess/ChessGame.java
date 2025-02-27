@@ -123,16 +123,23 @@ public class ChessGame {
                 ChessPiece piece =board.getPiece(new ChessPosition(i,j));
                 if (piece!=null && piece.getTeamColor()!=teamColor) {
                     Collection<ChessMove> moves = piece.pieceMoves(board, new ChessPosition(i,j));
-                    for (ChessMove move : moves) {
-                        if (move.getEndPosition().equals(kingSpot)) {
-                            return true;
-                        }
+                    if (checkKingSpot(moves, kingSpot)) {
+                        return true;
                     }
                 }
             }
         }
         return false;
 
+    }
+
+    private boolean checkKingSpot(Collection<ChessMove> moves, ChessPosition kingSpot) {
+        for (ChessMove move : moves) {
+            if (move.getEndPosition().equals(kingSpot)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
