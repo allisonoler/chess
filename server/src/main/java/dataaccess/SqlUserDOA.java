@@ -5,6 +5,9 @@ import model.UserData;
 
 import java.sql.*;
 
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
+import static java.sql.Types.NULL;
+
 
 public class SqlUserDOA implements UserDOA {
 
@@ -70,29 +73,28 @@ public class SqlUserDOA implements UserDOA {
 //        return pet.setId(id);
 //    }
 //
-//    private int executeUpdate(String statement, Object... params) throws DataAccessException {
-//        try (var conn = DatabaseManager.getConnection()) {
-//            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-//                for (var i = 0; i < params.length; i++) {
-//                    var param = params[i];
-//                    if (param instanceof String p) ps.setString(i + 1, p);
-//                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
-//                    else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
-//                    else if (param == null) ps.setNull(i + 1, NULL);
-//                }
-//                ps.executeUpdate();
-//
-//                var rs = ps.getGeneratedKeys();
-//                if (rs.next()) {
-//                    return rs.getInt(1);
-//                }
-//
-//                return 0;
-//            }
-//        } catch (SQLException e) {
-//            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
-//        }
-//    }
+    private int executeUpdate(String statement, Object... params) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                for (var i = 0; i < params.length; i++) {
+                    var param = params[i];
+                    if (param instanceof String p) ps.setString(i + 1, p);
+                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
+                    else if (param == null) ps.setNull(i + 1, NULL);
+                }
+                ps.executeUpdate();
+
+                var rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+
+                return 0;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
+        }
+    }
 
     private final String[] createStatements = {
             """
@@ -100,9 +102,10 @@ public class SqlUserDOA implements UserDOA {
               `username` varchar(256) NOT NULL,
               `password` varchar(256) NOT NULL,
               `email` varchar(256) NOT NULL,
-              PRIMARY KEY (`username`),
-            ) 
+              PRIMARY KEY (`username`)
+            );
             """
+
     };
 
 
@@ -114,6 +117,7 @@ public class SqlUserDOA implements UserDOA {
                     preparedStatement.executeUpdate();
                 }
             }
+
         } catch (SQLException ex) {
             throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
         }
@@ -121,7 +125,12 @@ public class SqlUserDOA implements UserDOA {
 
     @Override
     public void insertUser(UserData u) throws DataAccessException {
-
+//        var statement = "INSERT INTO pet (name, type, json) VALUES (?, ?, ?)";
+//        var json = new Gson().toJson(pet);
+//        var id = executeUpdate(statement, pet.name(), pet.type(), json);
+//        return new Pet(id, pet.name(), pet.type());
+        var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
+        executeUpdate(statement, u.username(), u.password(), u.email());
     }
 
     @Override

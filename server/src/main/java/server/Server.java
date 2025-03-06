@@ -19,13 +19,13 @@ public class Server {
 
     public Server() {
         try {
-            GameDOA gameDOA = new MemoryGameDOA();
-            UserDOA userDOA = new dataaccess.SqlUserDOA();
-            AuthDOA authDOA = new MemoryAuthDOA();
-            UserService userService = new UserService(userDOA, authDOA);
-            ClearService clearService = new ClearService(gameDOA, userDOA, authDOA);
+            this.gameDOA = new MemoryGameDOA();
+            this.userDOA = new dataaccess.SqlUserDOA();
+            this.authDOA = new MemoryAuthDOA();
+            this.userService = new UserService(userDOA, authDOA);
+            this.clearService = new ClearService(gameDOA, userDOA, authDOA);
 
-            GameService gameService = new GameService(gameDOA, authDOA);
+            this.gameService = new GameService(gameDOA, authDOA);
         } catch (DataAccessException e) {
             System.out.printf("Unable to start server: %s%n", e.getMessage());
         }

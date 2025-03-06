@@ -44,6 +44,7 @@ public class DatabaseManager {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
+            System.out.println("oh no");
             throw new DataAccessException(e.getMessage());
         }
     }
