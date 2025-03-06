@@ -9,13 +9,27 @@ import com.google.gson.Gson;
 import java.util.Map;
 
 public class Server {
-    GameDOA gameDOA = new MemoryGameDOA();
-    UserDOA userDOA = new MemoryUserDAO();
-    AuthDOA authDOA = new MemoryAuthDOA();
-    UserService userService = new UserService(userDOA, authDOA);
-    ClearService clearService = new ClearService(gameDOA, userDOA, authDOA);
+    GameDOA gameDOA;
+    UserDOA userDOA;
+    AuthDOA authDOA;
+    UserService userService;
+    ClearService clearService;
 
-    GameService gameService = new GameService(gameDOA, authDOA);
+    GameService gameService;
+
+    public Server() {
+        try {
+            GameDOA gameDOA = new MemoryGameDOA();
+            UserDOA userDOA = new dataaccess.SqlUserDOA();
+            AuthDOA authDOA = new MemoryAuthDOA();
+            UserService userService = new UserService(userDOA, authDOA);
+            ClearService clearService = new ClearService(gameDOA, userDOA, authDOA);
+
+            GameService gameService = new GameService(gameDOA, authDOA);
+        } catch (DataAccessException e) {
+            System.out.printf("Unable to start server: %s%n", e.getMessage());
+        }
+    }
 
     public int run(int desiredPort) {
 
