@@ -1,6 +1,5 @@
 package dataaccess;
 
-import model.AuthData;
 import model.UserData;
 
 import java.sql.*;
@@ -14,65 +13,6 @@ public class SqlUserDOA implements UserDOA {
     public SqlUserDOA() throws DataAccessException {
         configureDatabase();
     }
-
-//    public Pet addPet(Pet pet) throws ResponseException {
-//        var statement = "INSERT INTO pet (name, type, json) VALUES (?, ?, ?)";
-//        var json = new Gson().toJson(pet);
-//        var id = executeUpdate(statement, pet.name(), pet.type(), json);
-//        return new Pet(id, pet.name(), pet.type());
-//    }
-//
-//    public Pet getPet(int id) throws ResponseException {
-//        try (var conn = DatabaseManager.getConnection()) {
-//            var statement = "SELECT id, json FROM pet WHERE id=?";
-//            try (var ps = conn.prepareStatement(statement)) {
-//                ps.setInt(1, id);
-//                try (var rs = ps.executeQuery()) {
-//                    if (rs.next()) {
-//                        return readPet(rs);
-//                    }
-//                }
-//            }
-//        } catch (Exception e) {
-//            throw new ResponseException(500, String.format("Unable to read data: %s", e.getMessage()));
-//        }
-//        return null;
-//    }
-//
-//    public Collection<Pet> listPets() throws ResponseException {
-//        var result = new ArrayList<Pet>();
-//        try (var conn = DatabaseManager.getConnection()) {
-//            var statement = "SELECT id, json FROM pet";
-//            try (var ps = conn.prepareStatement(statement)) {
-//                try (var rs = ps.executeQuery()) {
-//                    while (rs.next()) {
-//                        result.add(readPet(rs));
-//                    }
-//                }
-//            }
-//        } catch (Exception e) {
-//            throw new ResponseException(500, String.format("Unable to read data: %s", e.getMessage()));
-//        }
-//        return result;
-//    }
-//
-//    public void deletePet(Integer id) throws ResponseException {
-//        var statement = "DELETE FROM pet WHERE id=?";
-//        executeUpdate(statement, id);
-//    }
-//
-//    public void deleteAllPets() throws ResponseException {
-//        var statement = "TRUNCATE pet";
-//        executeUpdate(statement);
-//    }
-//
-//    private Pet readPet(ResultSet rs) throws SQLException {
-//        var id = rs.getInt("id");
-//        var json = rs.getString("json");
-//        var pet = new Gson().fromJson(json, Pet.class);
-//        return pet.setId(id);
-//    }
-//
     private int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
@@ -125,26 +65,56 @@ public class SqlUserDOA implements UserDOA {
 
     @Override
     public void insertUser(UserData u) throws DataAccessException {
-//        var statement = "INSERT INTO pet (name, type, json) VALUES (?, ?, ?)";
-//        var json = new Gson().toJson(pet);
-//        var id = executeUpdate(statement, pet.name(), pet.type(), json);
-//        return new Pet(id, pet.name(), pet.type());
         var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
         executeUpdate(statement, u.username(), u.password(), u.email());
     }
 
     @Override
     public UserData readUser(String username) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username, password, email FROM user WHERE username=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (var rs= ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
+
+                    }
+                }
+            }
+        } catch (Exception e){
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
         return null;
     }
 
     @Override
-    public void clear() {
-
+    public void clear() throws DataAccessException {
+        var statement = "TRUNCATE user";
+        executeUpdate(statement);
     }
 
+
+    //I'M PRETTY SURE THIS DOESN'T WORK LOL
     @Override
-    public boolean empty() {
+    public boolean empty() throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT COUNT(*) FROM user";
+            try (var ps = conn.prepareStatement(statement)) {
+                try (var rs= ps.executeQuery()) {
+                    if (rs.next()) {
+                        if (rs.getInt(1) >0) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+
+                    }
+                }
+            }
+        } catch (Exception e){
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
         return false;
     }
 }
