@@ -88,23 +88,39 @@ public class SqlAuthDOA implements AuthDOA {
 
     @Override
     public void insertAuth(AuthData u) throws DataAccessException {
-        var statement = "INSERT INTO user (authToken, username) VALUES (?, ?)";
+        var statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
         executeUpdate(statement, u.authToken(), u.username());
     }
 
     @Override
     public void deleteAuth(String authtoken) throws DataAccessException {
-
+        var statement = "DELETE FROM auth WHERE authToken=?";
+        executeUpdate(statement, authtoken);
     }
 
     @Override
     public AuthData getAuth(String authtoken) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT authToken, username FROM auth WHERE authToken=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authtoken);
+                try (var rs= ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new AuthData(rs.getString("authToken"), rs.getString("username"));
+
+                    }
+                }
+            }
+        } catch (Exception e){
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
         return null;
     }
 
     @Override
-    public void clear() {
-
+    public void clear() throws DataAccessException {
+        var statement = "TRUNCATE auth";
+        executeUpdate(statement);
     }
 
     @Override

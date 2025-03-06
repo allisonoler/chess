@@ -9,7 +9,7 @@ public interface AuthDOA {
     void deleteAuth(String authtoken) throws DataAccessException;
 
     AuthData getAuth(String authtoken) throws DataAccessException;
-    void clear();
+    void clear() throws DataAccessException;
 
     boolean empty();
 }

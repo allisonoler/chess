@@ -21,7 +21,7 @@ public class Server {
         try {
             this.gameDOA = new MemoryGameDOA();
             this.userDOA = new dataaccess.SqlUserDOA();
-            this.authDOA = new MemoryAuthDOA();
+            this.authDOA = new SqlAuthDOA();
             this.userService = new UserService(userDOA, authDOA);
             this.clearService = new ClearService(gameDOA, userDOA, authDOA);
 
