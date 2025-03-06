@@ -106,7 +106,7 @@ public class SqlAuthDOA implements AuthDOA {
                 ps.setString(1, authtoken);
                 try (var rs= ps.executeQuery()) {
                     if (rs.next()) {
-                        return new AuthData(rs.getString("authToken"), rs.getString("username"));
+                        return new AuthData(rs.getString("username"), rs.getString("authToken"));
 
                     }
                 }
