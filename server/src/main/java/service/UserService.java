@@ -5,6 +5,7 @@ import dataaccess.DataAccessException;
 import dataaccess.UserDOA;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import service.requestsresults.*;
 
 import java.util.UUID;
@@ -28,7 +29,7 @@ public class UserService {
         try {
             UserData user = userDOA.readUser(registerRequest.username());
             if (user == null) {
-                userDOA.insertUser(new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email()));
+                userDOA.insertUser(new UserData(registerRequest.username(), BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt()), registerRequest.email()));
 
                 authDOA.insertAuth(new AuthData(registerRequest.username(), authToken));
 
@@ -45,7 +46,7 @@ public class UserService {
         try {
             UserData user = userDOA.readUser(loginRequest.username());
             if (user!=null) {
-                if (user.password().equals(loginRequest.password())) {
+                if (BCrypt.checkpw(loginRequest.password(), user.password())) {
                     authDOA.insertAuth(new AuthData(loginRequest.username(), authToken));
                 } else {
                     throw new UnauthorizedException("Unauthorized");
