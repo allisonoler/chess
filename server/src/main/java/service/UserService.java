@@ -29,7 +29,8 @@ public class UserService {
         try {
             UserData user = userDOA.readUser(registerRequest.username());
             if (user == null) {
-                userDOA.insertUser(new UserData(registerRequest.username(), BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt()), registerRequest.email()));
+                userDOA.insertUser(new UserData(registerRequest.username(), BCrypt.hashpw(registerRequest.password(),
+                        BCrypt.gensalt()), registerRequest.email()));
 
                 authDOA.insertAuth(new AuthData(registerRequest.username(), authToken));
 

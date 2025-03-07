@@ -12,7 +12,7 @@ import static java.sql.Types.NULL;
 public class SqlAuthDOA implements AuthDOA {
 
     public SqlAuthDOA() throws DataAccessException {
-        configureDatabase();
+        DatabaseManager.configureDatabase(createStatements);
     }
     private int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
@@ -45,21 +45,6 @@ public class SqlAuthDOA implements AuthDOA {
             """
 
     };
-
-
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-
-        } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
 
     @Override
     public void insertAuth(AuthData u) throws DataAccessException {

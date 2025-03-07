@@ -15,7 +15,7 @@ import static java.sql.Types.NULL;
 public class SqlGameDOA implements GameDOA {
 
     public SqlGameDOA() throws DataAccessException {
-        configureDatabase();
+        DatabaseManager.configureDatabase(createStatements);
     }
     private int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
@@ -53,21 +53,6 @@ public class SqlGameDOA implements GameDOA {
 
     };
 
-
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-
-        } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
-
     @Override
     public void insertGame(GameData g) throws DataAccessException {
         var statement = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
@@ -89,7 +74,10 @@ public class SqlGameDOA implements GameDOA {
             try (var ps = conn.prepareStatement(statement)) {
                 try (var rs= ps.executeQuery()) {
                     while (rs.next()) {
-                        result.add(new GameData(rs.getString("gameID"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), new Gson().fromJson(rs.getString("game"), ChessGame.class)));
+                        result.add(new GameData(rs.getString("gameID"),
+                                rs.getString("whiteUsername"), rs.getString("blackUsername"),
+                                rs.getString("gameName"), new Gson().fromJson(rs.getString("game"),
+                                ChessGame.class)));
 
                     }
                 }
@@ -136,7 +124,9 @@ public class SqlGameDOA implements GameDOA {
                 ps.setString(1, id);
                 try (var rs= ps.executeQuery()) {
                     if (rs.next()) {
-                        return new GameData(rs.getString("gameID"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), new Gson().fromJson(rs.getString("game"), ChessGame.class));
+                        return new GameData(rs.getString("gameID"), rs.getString("whiteUsername"),
+                                rs.getString("blackUsername"), rs.getString("gameName"),
+                                new Gson().fromJson(rs.getString("game"), ChessGame.class));
 
                     }
                 }
