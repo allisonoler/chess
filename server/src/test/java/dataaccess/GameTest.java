@@ -7,7 +7,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.xml.crypto.Data;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -106,23 +108,50 @@ public class GameTest {
         gameDao.deleteGame("3");
         assertNull(gameDao.getGame("3"));
     }
-//
-//    @Test
-//    public void negativeDeleteTest() throws DataAccessException {
-//        assertNull(authDao.getAuth("chocolate"));
-//        try {
-//            authDao.deleteAuth("chocolate");
-//        } catch (Exception e) {
-//            assertNotNull(e);
-//        }
-//
-//    }
-//
-//    @Test
-//    public void clearTest() throws DataAccessException {
-//        authDao.insertAuth(new AuthData("jon", "chocolate"));
-//        assertNotNull(authDao.getAuth("chocolate"));
-//        authDao.clear();
-//        assertNull(authDao.getAuth("chocolate"));
-//    }
+
+    @Test
+    public void negativeDeleteTest() throws DataAccessException {
+        assertNull(gameDao.getGame("3"));
+        try {
+            gameDao.deleteGame("chocolate");
+        } catch (Exception e) {
+            assertNotNull(e);
+        }
+
+    }
+
+    @Test
+    public void clearTest() throws DataAccessException {
+        gameDao.insertGame(new GameData("4", null, null, "fungame", new ChessGame()));
+        assertNotNull(gameDao.getGame("4"));
+        gameDao.clear();
+        assertNull(gameDao.getGame("4"));
+    }
+
+    @Test
+    public void positiveJoinGameTest() throws DataAccessException {
+        gameDao.insertGame(new GameData("5", null, null, "fungame", new ChessGame()));
+        gameDao.setGamePlayer("5", "allison", "WHITE");
+        assertEquals(gameDao.getGame("5").whiteUsername(),"allison");
+    }
+
+    @Test
+    public void negativeJoinGameTest() throws DataAccessException {
+        gameDao.insertGame(new GameData("5", null, null, "fungame", new ChessGame()));
+        gameDao.setGamePlayer("5", "allison", "WHITE");
+        try {
+            gameDao.setGamePlayer("5", "steve", "WHITE");
+        } catch (DataAccessException e) {
+            assertNotNull(e);
+        }
+    }
+
+    @Test
+    public void listGamesTest() throws DataAccessException {
+        gameDao.insertGame(new GameData("5", null, null, "fungame", new ChessGame()));
+        gameDao.insertGame(new GameData("6", null, "allison", "nope", new ChessGame()));
+        ArrayList<GameData> games = gameDao.listGame();
+        assertEquals(games.size(),2);
+        assertInstanceOf(ChessGame.class, games.get(0).game());
+    }
 }
