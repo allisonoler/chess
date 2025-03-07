@@ -19,16 +19,19 @@ public class Server {
 
     public Server() {
         try {
-            this.gameDOA = new MemoryGameDOA();
-            this.userDOA = new dataaccess.SqlUserDOA();
+            this.gameDOA = new SqlGameDOA();
+            this.userDOA = new SqlUserDOA();
             this.authDOA = new SqlAuthDOA();
             this.userService = new UserService(userDOA, authDOA);
             this.clearService = new ClearService(gameDOA, userDOA, authDOA);
 
             this.gameService = new GameService(gameDOA, authDOA);
+
         } catch (DataAccessException e) {
             System.out.printf("Unable to start server: %s%n", e.getMessage());
         }
+
+
     }
 
     public int run(int desiredPort) {

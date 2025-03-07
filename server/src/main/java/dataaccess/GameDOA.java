@@ -14,9 +14,9 @@ public interface GameDOA {
 
     void setGamePlayer(String id, String username, String playerColor) throws DataAccessException;
 
-    void clear();
+    void clear() throws DataAccessException;
 
     boolean empty();
 
-    GameData getGame(String id);
+    GameData getGame(String id) throws DataAccessException;
 }

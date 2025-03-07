@@ -60,31 +60,6 @@ public class SqlAuthDOA implements AuthDOA {
             throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
         }
     }
-//
-//    @Override
-//    public void insertUser(UserData u) throws DataAccessException {
-//        var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-//        executeUpdate(statement, u.username(), u.password(), u.email());
-//    }
-//
-//    @Override
-//    public UserData readUser(String username) throws DataAccessException {
-//        try (var conn = DatabaseManager.getConnection()) {
-//            var statement = "SELECT username, password, email FROM user WHERE username=?";
-//            try (var ps = conn.prepareStatement(statement)) {
-//                ps.setString(1, username);
-//                try (var rs= ps.executeQuery()) {
-//                    if (rs.next()) {
-//                        return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
-//
-//                    }
-//                }
-//            }
-//        } catch (Exception e){
-//            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
-//        }
-//        return null;
-//    }
 
     @Override
     public void insertAuth(AuthData u) throws DataAccessException {
@@ -127,34 +102,4 @@ public class SqlAuthDOA implements AuthDOA {
     public boolean empty() {
         return false;
     }
-
-//    @Override
-//    public void clear() throws DataAccessException {
-//        var statement = "TRUNCATE user";
-//        executeUpdate(statement);
-//    }
-//
-//
-//    //I'M PRETTY SURE THIS DOESN'T WORK LOL
-//    @Override
-//    public boolean empty() throws DataAccessException {
-//        try (var conn = DatabaseManager.getConnection()) {
-//            var statement = "SELECT COUNT(*) FROM user";
-//            try (var ps = conn.prepareStatement(statement)) {
-//                try (var rs= ps.executeQuery()) {
-//                    if (rs.next()) {
-//                        if (rs.getInt(1) >0) {
-//                            return true;
-//                        } else {
-//                            return false;
-//                        }
-//
-//                    }
-//                }
-//            }
-//        } catch (Exception e){
-//            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
-//        }
-//        return false;
-//    }
 }
