@@ -15,36 +15,6 @@ public class SqlAuthDOA implements AuthDOA {
     public SqlAuthDOA() throws DataAccessException {
         DatabaseManager.configureDatabase(createStatements);
     }
-    private int executeUpdate(String statement, Object... params) throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                return extracted(ps, params);
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
-        }
-    }
-
-    private static int extracted(PreparedStatement ps, Object[] params) throws SQLException {
-        for (var i = 0; i < params.length; i++) {
-            var param = params[i];
-            if (param instanceof String p) {
-                ps.setString(i + 1, p);
-            }
-            else if (param instanceof Integer p) {
-                ps.setInt(i + 1, p);
-            }
-            else if (param == null) {
-                ps.setNull(i + 1, NULL);
-            }
-        }
-        ps.executeUpdate();
-        var rs = ps.getGeneratedKeys();
-        if (rs.next()) {
-            return rs.getInt(1);
-        }
-        return 0;
-    }
 
     private final String[] createStatements = {
             """
@@ -60,13 +30,13 @@ public class SqlAuthDOA implements AuthDOA {
     @Override
     public void insertAuth(AuthData u) throws DataAccessException {
         var statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
-        executeUpdate(statement, u.authToken(), u.username());
+        DatabaseManager.executeUpdate(statement, u.authToken(), u.username());
     }
 
     @Override
     public void deleteAuth(String authtoken) throws DataAccessException {
         var statement = "DELETE FROM auth WHERE authToken=?";
-        executeUpdate(statement, authtoken);
+        DatabaseManager.executeUpdate(statement, authtoken);
     }
 
     @Override
@@ -91,7 +61,7 @@ public class SqlAuthDOA implements AuthDOA {
     @Override
     public void clear() throws DataAccessException {
         var statement = "TRUNCATE auth";
-        executeUpdate(statement);
+        DatabaseManager.executeUpdate(statement);
     }
 
     @Override

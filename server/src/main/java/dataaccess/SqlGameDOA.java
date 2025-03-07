@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 
+import javax.xml.crypto.Data;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -17,37 +18,6 @@ public class SqlGameDOA implements GameDOA {
 
     public SqlGameDOA() throws DataAccessException {
         DatabaseManager.configureDatabase(createStatements);
-    }
-    private int executeUpdate(String statement, Object... params) throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                return extracted(ps, params);
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
-        }
-    }
-
-    private static int extracted(PreparedStatement ps, Object[] params) throws SQLException {
-        for (var i = 0; i < params.length; i++) {
-            var param = params[i];
-            if (param instanceof String p) ps.setString(i + 1, p);
-            else if (param instanceof Integer p) {
-                ps.setInt(i + 1, p);
-            }
-            else if (param instanceof ChessGame p) {
-                ps.setString(i + 1, new Gson().toJson(p));
-            }
-            else if (param == null) {
-                ps.setString(i + 1, null);
-            }
-        }
-        ps.executeUpdate();
-        var rs = ps.getGeneratedKeys();
-        if (rs.next()) {
-            return rs.getInt(1);
-        }
-        return 0;
     }
 
     private final String[] createStatements = {
@@ -67,13 +37,13 @@ public class SqlGameDOA implements GameDOA {
     @Override
     public void insertGame(GameData g) throws DataAccessException {
         var statement = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
-        executeUpdate(statement, g.gameID(), g.whiteUsername(), g.blackUsername(), g.gameName(), g.game());
+        DatabaseManager.executeUpdate(statement, g.gameID(), g.whiteUsername(), g.blackUsername(), g.gameName(), g.game());
     }
 
     @Override
     public void deleteGame(String id) throws DataAccessException {
         var statement = "DELETE FROM game WHERE gameID=?";
-        executeUpdate(statement, id);
+        DatabaseManager.executeUpdate(statement, id);
     }
 
     @Override
@@ -110,7 +80,7 @@ public class SqlGameDOA implements GameDOA {
         } else {
             statement = "UPDATE game SET blackUsername=? WHERE gameID=?";
         }
-        executeUpdate(statement, username, id);
+        DatabaseManager.executeUpdate(statement, username, id);
 
 
 
@@ -119,7 +89,7 @@ public class SqlGameDOA implements GameDOA {
     @Override
     public void clear() throws DataAccessException {
         var statement = "TRUNCATE game";
-        executeUpdate(statement);
+        DatabaseManager.executeUpdate(statement);
     }
 
     @Override
