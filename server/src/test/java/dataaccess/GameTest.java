@@ -31,7 +31,6 @@ public class GameTest {
     @AfterEach
     void destroy() throws DataAccessException, SQLException {
         DatabaseManager.createDatabase();
-        gameDao = new SqlGameDOA();
         try (var conn = DatabaseManager.getConnection()) {
             var s2 = conn.prepareStatement("TRUNCATE game");
             try (s2) {

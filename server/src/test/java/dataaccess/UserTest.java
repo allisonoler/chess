@@ -27,7 +27,6 @@ public class UserTest {
     @AfterEach
     void destroy() throws DataAccessException, SQLException {
         DatabaseManager.createDatabase();
-        userDao = new SqlUserDOA();
         try (var conn = DatabaseManager.getConnection()) {
             var s = conn.prepareStatement("TRUNCATE user");
             try (s) {

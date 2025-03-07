@@ -28,7 +28,6 @@ public class AuthTest {
     @AfterEach
     void destroy() throws DataAccessException, SQLException {
         DatabaseManager.createDatabase();
-        authDao = new SqlAuthDOA();
         try (var conn = DatabaseManager.getConnection()) {
             var s2 = conn.prepareStatement("TRUNCATE auth");
             try (s2) {
