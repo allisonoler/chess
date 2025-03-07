@@ -57,7 +57,7 @@ public class UserTest {
 
     @Test
     public void negativeInsertTest() throws DataAccessException {
-        userDao.insertUser(new UserData("allison", "chocolate", "linoler@gmail.com"));
+        userDao.insertUser(new UserData("allison", "carmel", "linoler@gmail.com"));
         try {
             userDao.insertUser(new UserData("allison", "vanilla", "linoler@gmail.com"));
         } catch (DataAccessException e){
@@ -68,7 +68,7 @@ public class UserTest {
                     ps.setString(1, "allison");
                     try (var rs= ps.executeQuery()) {
                         if (rs.next()) {
-                            assertEquals(rs.getString("password"),"chocolate");
+                            assertEquals(rs.getString("password"),"carmel");
 
                         }
                     }

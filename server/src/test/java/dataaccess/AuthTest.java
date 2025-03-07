@@ -57,18 +57,19 @@ public class AuthTest {
 
     @Test
     public void negativeInsertTest() throws DataAccessException {
-        authDao.insertAuth(new AuthData("allison", "chocolate"));
+        authDao.insertAuth(new AuthData("allison", "carmel"));
         try {
             authDao.insertAuth(new AuthData("allison", "vanilla"));
         } catch (DataAccessException e){
             assertNotNull(e);
             try (var conn = DatabaseManager.getConnection()) {
                 var statement = "SELECT username, authToken FROM auth WHERE username=?";
+
                 try (var ps = conn.prepareStatement(statement)) {
                     ps.setString(1, "allison");
                     try (var rs= ps.executeQuery()) {
                         if (rs.next()) {
-                            assertEquals(rs.getString("authToken"),"chocolate");
+                            assertEquals(rs.getString("authToken"),"carmel");
 
                         }
                     }
