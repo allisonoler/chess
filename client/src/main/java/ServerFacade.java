@@ -1,8 +1,5 @@
 import com.google.gson.Gson;
-import service.requestsresults.LoginRequest;
-import service.requestsresults.LoginResult;
-import service.requestsresults.RegisterRequest;
-import service.requestsresults.RegisterResult;
+import service.requestsresults.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,9 +10,6 @@ import java.net.URI;
 import java.net.URL;
 
 public class ServerFacade {
-
-    //constructor and server url
-
     private final String serverUrl;
 
     public ServerFacade(String url) {
@@ -26,15 +20,35 @@ public class ServerFacade {
         return this.makeRequest("POST", path, request, RegisterResult.class);
     }
 
-//    public Pet addPet(Pet pet) throws ResponseException {
-//        var path = "/pet";
-//        return this.makeRequest("POST", path, pet, Pet.class);
-//    }
-
-    public LoginResult login(LoginRequest login) {
-        return null;
+    public LoginResult login(LoginRequest request) throws ResponseException {
+        var path = "/session";
+        return this.makeRequest("POST", path, request, LoginResult.class);
     }
 
+    void clear() throws ResponseException {
+        var path = "/db";
+        this.makeRequest("DELETE", path, null, null);
+    }
+
+    public void logout(LogoutRequest request) throws ResponseException {
+        var path = "/session";
+        this.makeRequest("DELETE", path, request, null);
+    }
+
+    public ListResult list(ListRequest request) throws ResponseException {
+        var path = "/game";
+        return this.makeRequest("GET", path, request, ListResult.class);
+    }
+
+    public CreateResult create(CreateRequest request) throws ResponseException {
+        var path = "/game";
+        return this.makeRequest("POST", path, request, CreateResult.class);
+    }
+
+    public void join(JoinRequest request) throws ResponseException {
+        var path = "/game";
+        this.makeRequest("PUT", path, request, null);
+    }
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
