@@ -6,7 +6,7 @@ public class Repl {
     private final ChessClient client;
 
     public Repl(String serverUrl) {
-        client = new ChessClient(serverUrl, this);
+        client = new ChessClient(serverUrl);
     }
 
     public void run() {
@@ -21,7 +21,7 @@ public class Repl {
 
             try {
                 result = client.eval(line);
-                System.out.print(BLUE + result);
+                System.out.print(result);
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
@@ -30,13 +30,14 @@ public class Repl {
         System.out.println();
     }
 
-    public void notify(Notification notification) {
-        System.out.println(RED + notification.message());
-        printPrompt();
-    }
+//    public void notify(Notification notification) {
+//        System.out.println(RED + notification.message());
+//        printPrompt();
+//    }
 
     private void printPrompt() {
-        System.out.print("\n" + RESET + ">>> " + GREEN);
+//        System.out.print("\n" + RESET + ">>> " + GREEN);
+        System.out.print("\n"  + ">>> " );
     }
 
 }
