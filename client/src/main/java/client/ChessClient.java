@@ -1,12 +1,12 @@
-
+package client;
 
 import java.util.Arrays;
 
-import com.google.gson.Gson;
 import service.requestsresults.*;
 
 public class ChessClient {
     private String visitorName = null;
+    private String visitorAuthToken = null;
     private final ServerFacade server;
     private final String serverUrl;
 //    private final NotificationHandler notificationHandler;
@@ -29,7 +29,7 @@ public class ChessClient {
                 case "login" -> login(params);
 //                case "rescue" -> rescuePet(params);
 //                case "list" -> listPets();
-//                case "signout" -> signOut();
+                case "logout" -> logout();
 //                case "adopt" -> adoptPet(params);
 //                case "adoptall" -> adoptAllPets();
                 case "quit" -> "quit";
@@ -47,6 +47,7 @@ public class ChessClient {
             visitorName = String.join("-", params);
 //            ws = new WebSocketFacade(serverUrl, notificationHandler);
 //            ws.enterPetShop(visitorName);
+            visitorAuthToken = loginResult.authToken();
             return String.format("You signed in as %s.", params[0]);
         }
         System.out.println("Hello??");
@@ -68,18 +69,23 @@ public class ChessClient {
 
     public String logout(String... params) throws ResponseException {
         if (params.length == 0) {
-//            server.logout(new LogoutRequest());
-            state = State.SIGNEDIN;
-            visitorName = String.join("-", params);
+            assertSignedIn();
+            System.out.println(visitorAuthToken);
+
+            server.logout(new LogoutRequest(visitorAuthToken));
+            visitorAuthToken = null;
+            String result = visitorName + " logged out.";
+            state = State.SIGNEDOUT;
+            visitorName = null;
 //            ws = new WebSocketFacade(serverUrl, notificationHandler);
 //            ws.enterPetShop(visitorName);
-            return String.format("You quit.");
+            return result;
         }
 
         throw new ResponseException(400, "Invalid input");
     }
 
-//    public String rescuePet(String... params) throws ResponseException {
+//    public String rescuePet(String... params) throws client.ResponseException {
 //        assertSignedIn();
 //        if (params.length >= 2) {
 //            var name = params[0];
@@ -88,10 +94,10 @@ public class ChessClient {
 //            pet = server.addPet(pet);
 //            return String.format("You rescued %s. Assigned ID: %d", pet.name(), pet.id());
 //        }
-//        throw new ResponseException(400, "Expected: <name> <CAT|DOG|FROG>");
+//        throw new client.ResponseException(400, "Expected: <name> <CAT|DOG|FROG>");
 //    }
 //
-//    public String listPets() throws ResponseException {
+//    public String listPets() throws client.ResponseException {
 //        assertSignedIn();
 //        var pets = server.listPets();
 //        var result = new StringBuilder();
@@ -102,7 +108,7 @@ public class ChessClient {
 //        return result.toString();
 //    }
 //
-//    public String adoptPet(String... params) throws ResponseException {
+//    public String adoptPet(String... params) throws client.ResponseException {
 //        assertSignedIn();
 //        if (params.length == 1) {
 //            try {
@@ -115,10 +121,10 @@ public class ChessClient {
 //            } catch (NumberFormatException ignored) {
 //            }
 //        }
-//        throw new ResponseException(400, "Expected: <pet id>");
+//        throw new client.ResponseException(400, "Expected: <pet id>");
 //    }
 //
-//    public String adoptAllPets() throws ResponseException {
+//    public String adoptAllPets() throws client.ResponseException {
 //        assertSignedIn();
 //        var buffer = new StringBuilder();
 //        for (var pet : server.listPets()) {
@@ -129,15 +135,15 @@ public class ChessClient {
 //        return buffer.toString();
 //    }
 //
-//    public String signOut() throws ResponseException {
+//    public String signOut() throws client.ResponseException {
 //        assertSignedIn();
 //        ws.leavePetShop(visitorName);
 //        ws = null;
-//        state = State.SIGNEDOUT;
+//        state = client.State.SIGNEDOUT;
 //        return String.format("%s left the shop", visitorName);
 //    }
 //
-//    private Pet getPet(int id) throws ResponseException {
+//    private Pet getPet(int id) throws client.ResponseException {
 //        for (var pet : server.listPets()) {
 //            if (pet.id() == id) {
 //                return pet;
@@ -158,10 +164,11 @@ public class ChessClient {
         return """
                 create <NAME> - a game
                 list - games
-                
-                - adoptAll
-                - signOut
-                - quit
+                join <ID> WHITE|BLACK - a game
+                observe <ID> - a game
+                logout - when you are done
+                quit - playing chess
+                help - with possible commands
                 """;
     }
 

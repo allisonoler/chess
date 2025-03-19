@@ -1,3 +1,5 @@
+package client;
+
 import com.google.gson.Gson;
 import service.requestsresults.*;
 
@@ -83,10 +85,10 @@ public class ServerFacade {
         if (!isSuccessful(status)) {
 //            try (InputStream respErr = http.getErrorStream()) {
 //                if (respErr != null) {
-//                    throw ResponseException.fromJson(respErr);
+//                    throw client.ResponseException.fromJson(respErr);
 //                }
 //            }
-//            throw new ResponseException(status, "connection failed");
+//            throw new client.ResponseException(status, "connection failed");
 
             throw new ResponseException(status, "other failure: " + status);
         }
