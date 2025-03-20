@@ -1,16 +1,9 @@
 package client;
 
-import chess.ChessGame;
-import com.google.gson.Gson;
-import model.GameData;
 import org.junit.jupiter.api.*;
 import server.Server;
-import client.ServerFacade;
 import service.requestsresults.*;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -39,23 +32,54 @@ public class ServerFacadeTests {
         serverFacade.clear();
     }
 
-    @AfterEach
-    public void clearDatabase2() throws ResponseException {
-        serverFacade.clear();
+    @Test
+    public void registerPositive() throws ResponseException {
+        RegisterResult registerResult = serverFacade.register(new RegisterRequest("username", "password", "email"));
+        assertNotNull(registerResult.authToken());
     }
 
+    @Test
+    public void registerNegative() throws ResponseException {
+        serverFacade.register(new RegisterRequest("username", "password", "email"));
+        try {
+            serverFacade.register(new RegisterRequest("username", "password", "email"));
 
+        } catch (ResponseException e) {
+            assertEquals(403, e.StatusCode());
+        }
+    }
+
+    @Test
+    public void loginPositive() throws ResponseException {
+        RegisterResult registerResult = serverFacade.register(new RegisterRequest("username", "password", "email"));
+        serverFacade.logout(new LogoutRequest(registerResult.authToken()));
+        LoginResult loginResult = serverFacade.login(new LoginRequest("username", "password"));
+        assertNotNull(loginResult.authToken());
+    }
+
+    @Test
+    public void loginNegative() {
+        try {
+            LoginResult loginResult = serverFacade.login(new LoginRequest("username", "password"));
+            assertNotNull(loginResult.authToken());
+        } catch (ResponseException e) {
+            assertEquals(401, e.StatusCode());
+        }
+    }
 
     @Test
     public void logoutPositive() throws ResponseException {
         RegisterResult registerResult = serverFacade.register(new RegisterRequest("username", "password", "email"));
         serverFacade.logout(new LogoutRequest(registerResult.authToken()));
-//        assertTrue(facade.logout());
+        try {
+            serverFacade.create(new CreateRequest("none", "hello"));
+        } catch (ResponseException e) {
+            assertEquals(401, e.StatusCode());
+        }
     }
 
     @Test
     public void logoutNegative() {
-//        assertFalse(facade.logout());
         try {
             serverFacade.logout(new LogoutRequest("hi"));
         } catch (ResponseException e) {
@@ -71,20 +95,31 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void createNegative() throws ResponseException {
-        RegisterResult registerResult = serverFacade.register(new RegisterRequest("test", "test", "test"));
-        CreateResult createResult = serverFacade.create(new CreateRequest(registerResult.authToken(), "game1"));
-        CreateResult createResult2 = serverFacade.create(new CreateRequest(registerResult.authToken(), "game1"));
-        assertNotNull(createResult2.gameID());
+    public void createNegative() {
+        try {
+            serverFacade.create(new CreateRequest("none", "game1"));
+        } catch (ResponseException e) {
+            assertEquals(401, e.StatusCode());
+        }
+
     }
 
     @Test
-    public void listPositive() throws ResponseException, URISyntaxException, IOException {
+    public void listPositive() throws ResponseException{
         RegisterResult registerResult = serverFacade.register(new RegisterRequest("test", "test", "test"));
-        CreateResult createResult = serverFacade.create(new CreateRequest(registerResult.authToken(), "game1"));
-        CreateResult createResult2 = serverFacade.create(new CreateRequest(registerResult.authToken(), "game1"));
+        serverFacade.create(new CreateRequest(registerResult.authToken(), "game1"));
+        serverFacade.create(new CreateRequest(registerResult.authToken(), "game1"));
         ListResult listResult = serverFacade.list(new ListRequest(registerResult.authToken()));
         assertNotNull(listResult.games());
+    }
+
+    @Test
+    public void listNegative() {
+        try {
+            serverFacade.list(new ListRequest("hi"));
+        } catch (ResponseException e) {
+            assertEquals(401, e.StatusCode());
+        }
     }
 
     @Test
@@ -92,6 +127,18 @@ public class ServerFacadeTests {
         RegisterResult registerResult = serverFacade.register(new RegisterRequest("test", "test", "test"));
         CreateResult createResult = serverFacade.create(new CreateRequest(registerResult.authToken(), "game1"));
         serverFacade.join(new JoinRequest(registerResult.authToken(), "WHITE",createResult.gameID()));
+    }
+
+    @Test
+    public void joinNegative() throws ResponseException {
+        RegisterResult registerResult = serverFacade.register(new RegisterRequest("test", "test", "test"));
+        CreateResult createResult = serverFacade.create(new CreateRequest(registerResult.authToken(), "game1"));
+        serverFacade.join(new JoinRequest(registerResult.authToken(), "WHITE",createResult.gameID()));
+        try {
+            serverFacade.join(new JoinRequest(registerResult.authToken(), "WHITE",createResult.gameID()));
+        } catch (ResponseException e) {
+            assertEquals(403, e.StatusCode());
+        }
     }
 
 }
