@@ -19,7 +19,7 @@ public class ChessClient {
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
 
-    private ArrayList<GameData> games = null;
+    private ArrayList<String> games = null;
 
     public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -113,7 +113,7 @@ public class ChessClient {
             if (gameNum>games.size()) {
                 throw new ResponseException(400, "Invalid game number");
             }
-            server.join(new JoinRequest(visitorAuthToken, params[1], games.get(gameNum-1).gameID()));
+            server.join(new JoinRequest(visitorAuthToken, params[1], games.get(gameNum-1)));
             return drawBoard(params[1]);
         }
         throw new ResponseException(400, "Invalid input");
@@ -136,9 +136,9 @@ public class ChessClient {
         var games = server.list(new ListRequest(visitorAuthToken));
         var result = new StringBuilder();
         int index = 1;
-        this.games = new ArrayList<GameData>();
+        this.games = new ArrayList<String>();
         for (var game : games.games()) {
-            this.games.add(game);
+            this.games.add(game.gameID());
             result.append("Game number: ");
             result.append(index);
             result.append(", Game name: ");
