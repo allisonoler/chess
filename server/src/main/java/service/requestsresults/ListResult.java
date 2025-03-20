@@ -1,5 +1,7 @@
-package requestsresults;
+package service.requestsresults;
 
+
+import model.GameData;
 
 import java.util.ArrayList;
 

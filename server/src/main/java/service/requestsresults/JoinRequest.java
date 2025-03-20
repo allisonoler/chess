@@ -1,4 +1,4 @@
-package requestsresults;
+package service.requestsresults;
 
 public record JoinRequest(
         String authToken,
