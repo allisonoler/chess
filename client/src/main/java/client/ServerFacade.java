@@ -42,8 +42,8 @@ public class ServerFacade {
 
     public CreateResult create(CreateRequest request) throws ResponseException {
         var path = "/game";
-        var return_result = this.makeRequest("POST", path, request, CreateResult.class, request.authToken());
-        return return_result;
+        var returnResult = this.makeRequest("POST", path, request, CreateResult.class, request.authToken());
+        return returnResult;
     }
 
     public void join(JoinRequest request) throws ResponseException {
@@ -83,13 +83,6 @@ public class ServerFacade {
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
-//            try (InputStream respErr = http.getErrorStream()) {
-//                if (respErr != null) {
-//                    throw client.ResponseException.fromJson(respErr);
-//                }
-//            }
-//            throw new client.ResponseException(status, "connection failed");
-
             throw new ResponseException(status, "other failure: " + status);
         }
     }

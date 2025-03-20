@@ -31,20 +31,15 @@ public class Repl {
         System.out.println();
     }
 
-//    public void notify(Notification notification) {
-//        System.out.println(RED + notification.message());
-//        printPrompt();
-//    }
 
     private void printPrompt() {
-        String state_string = "";
+        String stateString = "";
         if (client.getState().equals(State.SIGNEDOUT)) {
-            state_string = "[SIGNED OUT]";
+            stateString = "[SIGNED OUT]";
         } else if (client.getState().equals(State.SIGNEDIN)) {
-            state_string = "[SIGNED IN]";
+            stateString = "[SIGNED IN]";
         }
-        System.out.print("\n" + state_string + ">>> ");
-//        System.out.print("\n"  + ">>> " );
+        System.out.print("\n" + stateString + ">>> ");
     }
 
 

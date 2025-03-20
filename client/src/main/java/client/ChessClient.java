@@ -162,54 +162,54 @@ public class ChessClient {
     }
 
     public String drawBoard(String playerColor) {
-        StringBuilder return_result = new StringBuilder();
+        StringBuilder returnResult = new StringBuilder();
         ChessBoard board = new ChessBoard();
         board.resetBoard();
-        boolean color_switch = true;
-        String column_label = "    a  b  c  d  e  f  g  h    ";
+        boolean colorSwitch = true;
+        String columnLabel = "    a  b  c  d  e  f  g  h    ";
         ArrayList<Integer> rows = new ArrayList<Integer>();
         for (int i = 1; i <= 8; i++) {
             rows.add(i);
         }
         if (playerColor.equals("BLACK")) {
-            column_label = new StringBuilder(column_label).reverse().toString();
+            columnLabel = new StringBuilder(columnLabel).reverse().toString();
             Collections.reverse(rows);
-            color_switch = false;
+            colorSwitch = false;
         }
-        return_result.append(column_label + "\n");
+        returnResult.append(columnLabel + "\n");
         for (int i: rows) {
-            return_result.append(" " + i + " ");
+            returnResult.append(" " + i + " ");
             for (int j = 1; j<=8; j++) {
-                if (color_switch) {
-                    return_result.append(EscapeSequences.SET_BG_COLOR_WHITE);
-                    color_switch = false;
+                if (colorSwitch) {
+                    returnResult.append(EscapeSequences.SET_BG_COLOR_WHITE);
+                    colorSwitch = false;
                 } else {
-                    return_result.append(EscapeSequences.SET_BG_COLOR_MAGENTA);
-                    color_switch = true;
+                    returnResult.append(EscapeSequences.SET_BG_COLOR_MAGENTA);
+                    colorSwitch = true;
                 }
                 if (board.getPiece(new ChessPosition(i,j)) == null) {
-                    return_result.append("   ");
+                    returnResult.append("   ");
                 } else if (board.getPiece(new ChessPosition(i, j)).getPieceType().equals(ChessPiece.PieceType.ROOK)) {
-                    return_result.append(" R ");
+                    returnResult.append(" R ");
                 } else if (board.getPiece(new ChessPosition(i, j)).getPieceType().equals(ChessPiece.PieceType.KNIGHT)) {
-                    return_result.append(" N ");
+                    returnResult.append(" N ");
                 } else if (board.getPiece(new ChessPosition(i, j)).getPieceType().equals(ChessPiece.PieceType.BISHOP)) {
-                    return_result.append(" B ");
+                    returnResult.append(" B ");
                 } else if (board.getPiece(new ChessPosition(i, j)).getPieceType().equals(ChessPiece.PieceType.QUEEN)) {
-                    return_result.append(" Q ");
+                    returnResult.append(" Q ");
                 } else if (board.getPiece(new ChessPosition(i, j)).getPieceType().equals(ChessPiece.PieceType.KING)) {
-                    return_result.append(" K ");
+                    returnResult.append(" K ");
                 } else if (board.getPiece(new ChessPosition(i, j)).getPieceType().equals(ChessPiece.PieceType.PAWN)) {
-                    return_result.append(" P ");
+                    returnResult.append(" P ");
                 }
             }
-            color_switch = !color_switch;
-            return_result.append(EscapeSequences.RESET_BG_COLOR);
-            return_result.append(" " + i + " ");
-            return_result.append("\n");
+            colorSwitch = !colorSwitch;
+            returnResult.append(EscapeSequences.RESET_BG_COLOR);
+            returnResult.append(" " + i + " ");
+            returnResult.append("\n");
         }
-        return_result.append(column_label + "\n");
-        return return_result.toString();
+        returnResult.append(columnLabel + "\n");
+        return returnResult.toString();
     }
 
     public String help() {

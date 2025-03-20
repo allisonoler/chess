@@ -45,7 +45,7 @@ public class ServerFacadeTests {
             serverFacade.register(new RegisterRequest("username", "password", "email"));
 
         } catch (ResponseException e) {
-            assertEquals(403, e.StatusCode());
+            assertEquals(403, e.statusCode());
         }
     }
 
@@ -63,7 +63,7 @@ public class ServerFacadeTests {
             LoginResult loginResult = serverFacade.login(new LoginRequest("username", "password"));
             assertNotNull(loginResult.authToken());
         } catch (ResponseException e) {
-            assertEquals(401, e.StatusCode());
+            assertEquals(401, e.statusCode());
         }
     }
 
@@ -74,7 +74,7 @@ public class ServerFacadeTests {
         try {
             serverFacade.create(new CreateRequest("none", "hello"));
         } catch (ResponseException e) {
-            assertEquals(401, e.StatusCode());
+            assertEquals(401, e.statusCode());
         }
     }
 
@@ -83,7 +83,7 @@ public class ServerFacadeTests {
         try {
             serverFacade.logout(new LogoutRequest("hi"));
         } catch (ResponseException e) {
-            assertEquals(401, e.StatusCode());
+            assertEquals(401, e.statusCode());
         }
     }
 
@@ -99,7 +99,7 @@ public class ServerFacadeTests {
         try {
             serverFacade.create(new CreateRequest("none", "game1"));
         } catch (ResponseException e) {
-            assertEquals(401, e.StatusCode());
+            assertEquals(401, e.statusCode());
         }
 
     }
@@ -118,7 +118,7 @@ public class ServerFacadeTests {
         try {
             serverFacade.list(new ListRequest("hi"));
         } catch (ResponseException e) {
-            assertEquals(401, e.StatusCode());
+            assertEquals(401, e.statusCode());
         }
     }
 
@@ -137,7 +137,7 @@ public class ServerFacadeTests {
         try {
             serverFacade.join(new JoinRequest(registerResult.authToken(), "WHITE",createResult.gameID()));
         } catch (ResponseException e) {
-            assertEquals(403, e.StatusCode());
+            assertEquals(403, e.statusCode());
         }
     }
 
@@ -149,7 +149,7 @@ public class ServerFacadeTests {
         try {
             serverFacade.join(new JoinRequest(registerResult.authToken(), "WHITE",createResult.gameID()));
         } catch (ResponseException e) {
-            assertEquals(401, e.StatusCode());
+            assertEquals(401, e.statusCode());
         }
     }
 
