@@ -48,6 +48,7 @@ public class Server {
         Spark.post("/game", this::createHandler);
         Spark.get("/game", this::listHandler);
         Spark.put("/game", this::joinHandler);
+        Spark.post("/test", this::testHandler);
 
         Spark.exception(UnauthorizedException.class, this::unauthorizedExceptionHandler);
         Spark.exception(ForbiddenException.class, this::forbiddenExceptionHandler);
@@ -56,6 +57,11 @@ public class Server {
 
         Spark.awaitInitialization();
         return Spark.port();
+    }
+
+    private String testHandler(Request req, Response res) {
+        res.status(200);
+        return "hi";
     }
 
     private Object clearHandler(Request req, Response res) throws DataAccessException {

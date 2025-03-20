@@ -7,9 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
+import java.util.Map;
 
 public class ServerFacade {
     private final String serverUrl;
@@ -36,10 +35,14 @@ public class ServerFacade {
         var path = "/session";
         this.makeRequest("DELETE", path, request, null, request.authToken());
     }
+    public void test(LogoutRequest request) throws ResponseException {
+        var path = "/test";
+        this.makeRequest("POST", path, request, null, null);
+    }
 
     public ListResult list(ListRequest request) throws ResponseException {
         var path = "/game";
-        return this.makeRequest("GET", path, request, ListResult.class, request.authToken());
+        return this.makeRequest("GET", path, null, ListResult.class, request.authToken());
     }
 
     public CreateResult create(CreateRequest request) throws ResponseException {
@@ -71,9 +74,10 @@ public class ServerFacade {
 
 
     private static void writeBody(Object request, HttpURLConnection http, String authToken) throws IOException {
+        http.addRequestProperty("authorization", authToken);
         if (request != null) {
             http.addRequestProperty("Content-Type", "application/json");
-            http.addRequestProperty("authorization", authToken);
+
             String reqData = new Gson().toJson(request);
             try (OutputStream reqBody = http.getOutputStream()) {
                 reqBody.write(reqData.getBytes());

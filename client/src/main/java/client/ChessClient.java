@@ -1,5 +1,7 @@
 package client;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import chess.ChessBoard;
@@ -43,6 +45,10 @@ public class ChessClient {
             };
         } catch (ResponseException ex) {
             return ex.getMessage();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 //
@@ -124,7 +130,7 @@ public class ChessClient {
 //        throw new client.ResponseException(400, "Expected: <name> <CAT|DOG|FROG>");
 //    }
 //
-    public String list() throws client.ResponseException {
+    public String list() throws client.ResponseException, URISyntaxException, IOException {
         assertSignedIn();
         var games = server.list(new ListRequest(visitorAuthToken));
         var result = new StringBuilder();
