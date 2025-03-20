@@ -11,6 +11,7 @@ import chess.ChessPosition;
 import model.GameData;
 import service.requestsresults.*;
 import ui.EscapeSequences;
+import java.util.Collections;
 
 public class ChessClient {
     private String visitorName = null;
@@ -161,16 +162,16 @@ public class ChessClient {
         StringBuilder return_result = new StringBuilder();
         ChessBoard board = new ChessBoard();
         board.resetBoard();
-        boolean color_switch = false;
+        boolean color_switch = true;
         String column_label = "    a  b  c  d  e  f  g  h    ";
         ArrayList<Integer> rows = new ArrayList<Integer>();
         for (int i = 1; i <= 8; i++) {
             rows.add(i);
         }
         if (playerColor.equals("BLACK")) {
-            new StringBuilder(column_label).reverse().toString();
-            rows = (ArrayList<Integer>) rows.reversed();
-            color_switch = true;
+            column_label = new StringBuilder(column_label).reverse().toString();
+            Collections.reverse(rows);
+            color_switch = false;
         }
         return_result.append(column_label + "\n");
         for (int i: rows) {
