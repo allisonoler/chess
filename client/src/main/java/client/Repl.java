@@ -25,7 +25,7 @@ public class Repl {
                 System.out.print(result);
             } catch (Throwable e) {
                 var msg = e.toString();
-                System.out.print(e.getMessage());
+                System.out.print(msg);
             }
         }
         System.out.println();
