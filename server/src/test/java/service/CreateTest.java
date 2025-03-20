@@ -2,7 +2,10 @@ package service;
 
 import dataaccess.*;
 import org.junit.jupiter.api.Test;
-import service.requestsresults.*;
+import requestsresults.CreateRequest;
+import requestsresults.CreateResult;
+import requestsresults.RegisterRequest;
+import requestsresults.RegisterResult;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;

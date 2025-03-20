@@ -2,8 +2,8 @@ package service;
 
 import dataaccess.*;
 import org.junit.jupiter.api.Test;
-import service.requestsresults.LoginRequest;
-import service.requestsresults.RegisterRequest;
+import requestsresults.LoginRequest;
+import requestsresults.RegisterRequest;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;

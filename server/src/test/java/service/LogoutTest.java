@@ -1,9 +1,8 @@
 package service;
 
 import dataaccess.*;
-import org.eclipse.jetty.util.log.Log;
 import org.junit.jupiter.api.Test;
-import service.requestsresults.*;
+import requestsresults.*;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;

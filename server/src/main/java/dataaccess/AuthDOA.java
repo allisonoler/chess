@@ -1,7 +1,6 @@
 package dataaccess;
 
 import model.AuthData;
-import model.UserData;
 
 public interface AuthDOA {
     void insertAuth(AuthData u) throws DataAccessException;

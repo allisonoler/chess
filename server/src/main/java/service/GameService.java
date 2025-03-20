@@ -4,7 +4,7 @@ import chess.ChessGame;
 import dataaccess.*;
 import model.AuthData;
 import model.GameData;
-import service.requestsresults.*;
+import requestsresults.*;
 
 import java.util.ArrayList;
 

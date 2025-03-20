@@ -4,8 +4,8 @@ import dataaccess.DataAccessException;
 import dataaccess.*;
 import dataaccess.UserDOA;
 import org.junit.jupiter.api.Test;
-import service.requestsresults.RegisterRequest;
-import service.requestsresults.RegisterResult;
+import requestsresults.RegisterRequest;
+import requestsresults.RegisterResult;
 
 import static org.junit.jupiter.api.Assertions.*;
 

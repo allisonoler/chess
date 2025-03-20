@@ -2,11 +2,6 @@ package dataaccess;
 
 import model.UserData;
 
-import java.sql.*;
-
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.sql.Types.NULL;
-
 
 public class SqlUserDOA implements UserDOA {
 

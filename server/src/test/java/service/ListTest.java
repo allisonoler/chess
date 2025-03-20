@@ -3,7 +3,7 @@ package service;
 import dataaccess.*;
 import model.GameData;
 import org.junit.jupiter.api.Test;
-import service.requestsresults.*;
+import requestsresults.*;
 
 import java.util.ArrayList;
 

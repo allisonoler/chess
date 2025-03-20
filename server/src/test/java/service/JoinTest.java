@@ -1,10 +1,9 @@
 package service;
 
 import dataaccess.*;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.requestsresults.*;
+import requestsresults.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 

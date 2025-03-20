@@ -1,8 +1,8 @@
 package client;
 
 import org.junit.jupiter.api.*;
+import requestsresults.*;
 import server.Server;
-import service.requestsresults.*;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
