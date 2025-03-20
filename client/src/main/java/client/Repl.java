@@ -1,16 +1,17 @@
 package client;
 
 import java.util.Scanner;
+import ui.EscapeSequences;
 
 public class Repl {
     private final ChessClient client;
-
+    private State state;
     public Repl(String serverUrl) {
         client = new ChessClient(serverUrl);
     }
 
     public void run() {
-        System.out.println("\uD83D\uDC36 Welcome to the pet store. Sign in to start.");
+        System.out.println("\uD83D\uDC36 Welcome to chess! Sign in or register to start.");
         System.out.print(client.help());
 
         Scanner scanner = new Scanner(System.in);
@@ -36,8 +37,16 @@ public class Repl {
 //    }
 
     private void printPrompt() {
-//        System.out.print("\n" + RESET + ">>> " + GREEN);
-        System.out.print("\n"  + ">>> " );
+        String state_string = "";
+        if (client.getState().equals(State.SIGNEDOUT)) {
+            state_string = "[SIGNED OUT]";
+        } else if (client.getState().equals(State.SIGNEDIN)) {
+            state_string = "[SIGNED IN]";
+        }
+        System.out.print("\n" + state_string + ">>> ");
+//        System.out.print("\n"  + ">>> " );
     }
+
+
 
 }

@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.*;
-import java.util.Map;
 
 public class ServerFacade {
     private final String serverUrl;
@@ -34,10 +33,6 @@ public class ServerFacade {
     public void logout(LogoutRequest request) throws ResponseException {
         var path = "/session";
         this.makeRequest("DELETE", path, request, null, request.authToken());
-    }
-    public void test(LogoutRequest request) throws ResponseException {
-        var path = "/test";
-        this.makeRequest("POST", path, request, null, null);
     }
 
     public ListResult list(ListRequest request) throws ResponseException {

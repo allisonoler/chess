@@ -45,10 +45,6 @@ public class ServerFacadeTests {
     }
 
 
-    @Test
-    public void sampleTest() {
-        Assertions.assertTrue(true);
-    }
 
     @Test
     public void logoutPositive() throws ResponseException {
@@ -96,11 +92,6 @@ public class ServerFacadeTests {
         RegisterResult registerResult = serverFacade.register(new RegisterRequest("test", "test", "test"));
         CreateResult createResult = serverFacade.create(new CreateRequest(registerResult.authToken(), "game1"));
         serverFacade.join(new JoinRequest(registerResult.authToken(), "WHITE",createResult.gameID()));
-    }
-
-    @Test
-    public void test() throws ResponseException {
-        serverFacade.test(new LogoutRequest("hi"));
     }
 
 }
