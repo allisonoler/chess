@@ -110,6 +110,9 @@ public class ChessClient {
             } catch (Exception e) {
                 throw new ResponseException(400, "Invalid input");
             }
+            if (gameNum>games.size()) {
+                throw new ResponseException(400, "Invalid game number");
+            }
             server.join(new JoinRequest(visitorAuthToken, params[1], games.get(gameNum-1).gameID()));
             return drawBoard(params[1]);
         }

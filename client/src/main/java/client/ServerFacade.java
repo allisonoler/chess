@@ -88,9 +88,9 @@ public class ServerFacade {
 //                    throw client.ResponseException.fromJson(respErr);
 //                }
 //            }
-//            throw new client.ResponseException(status, "connection failed");
+            throw new client.ResponseException(status, "connection failed");
+//            throw new ResponseException(status, http.getResponseMessage());
 
-            throw new ResponseException(status, "other failure: " + status);
         }
     }
 
