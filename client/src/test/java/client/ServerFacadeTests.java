@@ -141,4 +141,16 @@ public class ServerFacadeTests {
         }
     }
 
+    @Test
+    public void clear() throws ResponseException {
+        RegisterResult registerResult = serverFacade.register(new RegisterRequest("test", "test", "test"));
+        CreateResult createResult = serverFacade.create(new CreateRequest(registerResult.authToken(), "game1"));
+        serverFacade.clear();
+        try {
+            serverFacade.join(new JoinRequest(registerResult.authToken(), "WHITE",createResult.gameID()));
+        } catch (ResponseException e) {
+            assertEquals(401, e.StatusCode());
+        }
+    }
+
 }

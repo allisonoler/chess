@@ -2,11 +2,13 @@ package client;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import chess.ChessBoard;
 import chess.ChessPiece;
 import chess.ChessPosition;
+import model.GameData;
 import service.requestsresults.*;
 import ui.EscapeSequences;
 
@@ -16,13 +18,15 @@ public class ChessClient {
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
 
+    private ArrayList<GameData> games = null;
+
     public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
     }
 
     public String eval(String input) {
         try {
-            var tokens = input.toLowerCase().split(" ");
+            var tokens = input.split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
@@ -89,7 +93,7 @@ public class ChessClient {
         if (params.length == 1) {
             assertSignedIn();
             CreateResult createResult = server.create(new CreateRequest(visitorAuthToken, params[0]));
-            String result = "Created game: " + params[0] + " , with ID: " + createResult.gameID();
+            String result = "Created game: " + params[0];
             return result;
         }
 
@@ -97,10 +101,16 @@ public class ChessClient {
     }
 
     public String join(String... params) throws ResponseException {
-        if (params.length == 2) {
+        if (params.length == 2 && (params[1].equals("WHITE") || params[1].equals("BLACK"))) {
             assertSignedIn();
-//            server.join(new JoinRequest(visitorAuthToken, params[0], params[1]));
-            return drawBoard();
+            int gameNum = 0;
+            try {
+                gameNum = Integer.parseInt(params[0]);
+            } catch (Exception e) {
+                throw new ResponseException(400, "Invalid input");
+            }
+            server.join(new JoinRequest(visitorAuthToken, params[1], games.get(gameNum-1).gameID()));
+            return drawBoard(params[1]);
         }
         throw new ResponseException(400, "Invalid input");
     }
@@ -108,7 +118,7 @@ public class ChessClient {
     public String observe(String... params) throws ResponseException {
         if (params.length == 1) {
             assertSignedIn();
-            return drawBoard();
+            return drawBoard("WHITE");
         }
         throw new ResponseException(400, "Invalid input");
     }
@@ -121,25 +131,49 @@ public class ChessClient {
         assertSignedIn();
         var games = server.list(new ListRequest(visitorAuthToken));
         var result = new StringBuilder();
+        int index = 1;
+        this.games = new ArrayList<GameData>();
         for (var game : games.games()) {
-            result.append("Game name: ");
+            this.games.add(game);
+            result.append("Game number: ");
+            result.append(index);
+            result.append(", Game name: ");
             result.append(game.gameName());
             result.append(", White username: ");
-            result.append(game.whiteUsername());
+            if (game.whiteUsername() == null) {
+                result.append("N/A");
+            } else {
+                result.append(game.whiteUsername());
+            }
             result.append(", Black username: ");
-            result.append(game.blackUsername());
+            if (game.blackUsername() == null) {
+                result.append("N/A");
+            } else {
+                result.append(game.blackUsername());
+            }
             result.append('\n');
+            index++;
         }
         return result.toString();
     }
 
-    public String drawBoard() {
+    public String drawBoard(String playerColor) {
         StringBuilder return_result = new StringBuilder();
         ChessBoard board = new ChessBoard();
         board.resetBoard();
-        boolean color_switch = true;
-        return_result.append("    h  g  f  e  d  c  b  a  \n");
-        for (int i = 1; i<=8;i++) {
+        boolean color_switch = false;
+        String column_label = "    a  b  c  d  e  f  g  h    ";
+        ArrayList<Integer> rows = new ArrayList<Integer>();
+        for (int i = 1; i <= 8; i++) {
+            rows.add(i);
+        }
+        if (playerColor.equals("BLACK")) {
+            new StringBuilder(column_label).reverse().toString();
+            rows = (ArrayList<Integer>) rows.reversed();
+            color_switch = true;
+        }
+        return_result.append(column_label + "\n");
+        for (int i: rows) {
             return_result.append(" " + i + " ");
             for (int j = 1; j<=8; j++) {
                 if (color_switch) {
@@ -170,8 +204,7 @@ public class ChessClient {
             return_result.append(" " + i + " ");
             return_result.append("\n");
         }
-        return_result.append("    h  g  f  e  d  c  b  a  ");
-
+        return_result.append(column_label + "\n");
         return return_result.toString();
     }
 
