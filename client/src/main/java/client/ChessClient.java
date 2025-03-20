@@ -9,7 +9,7 @@ import chess.ChessBoard;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
-import service.requestsresults.*;
+import requestsresults.*;
 import ui.EscapeSequences;
 import java.util.Collections;
 
