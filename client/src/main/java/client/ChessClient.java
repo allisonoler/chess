@@ -60,7 +60,6 @@ public class ChessClient {
             visitorAuthToken = loginResult.authToken();
             return String.format("You signed in as %s.", params[0]);
         }
-        System.out.println("Hello??");
         throw new ResponseException(400, "Invalid credentials");
     }
 

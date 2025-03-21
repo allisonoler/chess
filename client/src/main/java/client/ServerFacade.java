@@ -83,7 +83,16 @@ public class ServerFacade {
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
-            throw new ResponseException(status, "other failure: " + status);
+            if (status == 500) {
+                throw new ResponseException(status, "Issue connecting to database, please try again.");
+            }
+            if (status == 401) {
+                throw new ResponseException(status, "Authentication required.");
+            }
+            if (status == 403) {
+                throw new ResponseException(status, "Action not permitted.");
+            }
+            throw new ResponseException(status, "other failure");
         }
     }
 
