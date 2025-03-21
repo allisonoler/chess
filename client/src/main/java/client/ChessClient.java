@@ -104,15 +104,7 @@ public class ChessClient {
     public String join(String... params) throws ResponseException {
         if (params.length == 2 && (params[1].equals("WHITE") || params[1].equals("BLACK"))) {
             assertSignedIn();
-            int gameNum = 0;
-            try {
-                gameNum = Integer.parseInt(params[0]);
-            } catch (Exception e) {
-                throw new ResponseException(400, "Invalid input");
-            }
-            if (gameNum>games.size()) {
-                throw new ResponseException(400, "Invalid game number");
-            }
+            int gameNum = getGameNum(params[0]);
             server.join(new JoinRequest(visitorAuthToken, params[1], games.get(gameNum-1).gameID()));
             return drawBoard(params[1]);
         }
@@ -122,9 +114,23 @@ public class ChessClient {
     public String observe(String... params) throws ResponseException {
         if (params.length == 1) {
             assertSignedIn();
+            int gameNum = getGameNum(params[0]);
             return drawBoard("WHITE");
         }
         throw new ResponseException(400, "Invalid input");
+    }
+
+    private int getGameNum(String param) throws ResponseException {
+        int gameNum = 0;
+        try {
+            gameNum = Integer.parseInt(param);
+        } catch (Exception e) {
+            throw new ResponseException(400, "Invalid input");
+        }
+        if (gameNum>games.size()) {
+            throw new ResponseException(400, "Invalid game number");
+        }
+        return gameNum;
     }
 
     public State getState() {
