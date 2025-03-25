@@ -103,6 +103,7 @@ public class ChessClient {
     public String join(String... params) throws ResponseException {
         if (params.length == 2 && (params[1].equals("WHITE") || params[1].equals("BLACK"))) {
             assertSignedIn();
+            state = State.GAMEPLAY;
             int gameNum = getGameNum(params[0]);
             server.join(new JoinRequest(visitorAuthToken, params[1], games.get(gameNum-1).gameID()));
             return drawBoard(params[1]);
@@ -113,6 +114,7 @@ public class ChessClient {
     public String observe(String... params) throws ResponseException {
         if (params.length == 1) {
             assertSignedIn();
+            state = State.GAMEPLAY;
             int gameNum = getGameNum(params[0]);
             return drawBoard("WHITE");
         }
@@ -229,21 +231,38 @@ public class ChessClient {
                     quit - playing chess
                     help - with possible commands
                     """;
+        } else if (state == State.SIGNEDIN) {
+            return """
+                    create <NAME> - a game
+                    list - games
+                    join <ID> WHITE|BLACK - a game
+                    observe <ID> - a game
+                    logout - when you are done
+                    quit - playing chess
+                    help - with possible commands
+                    """;
+        } else {
+            return """
+                    redraw - the chessboard
+                    leave - the game
+                    move <POSITION> (ex: a4) - make move
+                    resign - give up in game
+                    leave - leave game
+                    highlight <POSITION> (ex: a4) - highlights all valid squares for selected piece
+                    help - with possible commands
+                    """;
         }
-        return """
-                create <NAME> - a game
-                list - games
-                join <ID> WHITE|BLACK - a game
-                observe <ID> - a game
-                logout - when you are done
-                quit - playing chess
-                help - with possible commands
-                """;
     }
 
     private void assertSignedIn() throws ResponseException {
-        if (state == State.SIGNEDOUT) {
+        if (state != State.SIGNEDIN) {
             throw new ResponseException(400, "You must sign in");
+        }
+    }
+
+    private void assertGameplay() throws ResponseException {
+        if (state != State.GAMEPLAY) {
+            throw new ResponseException(400, "You are not currently playing a game");
         }
     }
 }
