@@ -173,18 +173,22 @@ public class ChessClient {
         boolean colorSwitch = true;
         String columnLabel = "    a  b  c  d  e  f  g  h    ";
         ArrayList<Integer> rows = new ArrayList<Integer>();
+        ArrayList<Integer> cols = new ArrayList<Integer>();
         for (int i = 1; i <= 8; i++) {
             rows.add(i);
+            cols.add(i);
         }
         if (playerColor.equals("BLACK")) {
             columnLabel = new StringBuilder(columnLabel).reverse().toString();
+//            colorSwitch = false;
+            Collections.reverse(cols);
+        } else {
             Collections.reverse(rows);
-            colorSwitch = false;
         }
         returnResult.append(columnLabel + "\n");
         for (int i: rows) {
             returnResult.append(" " + i + " ");
-            for (int j = 1; j<=8; j++) {
+            for (int j: cols) {
                 if (colorSwitch) {
                     returnResult.append(EscapeSequences.SET_BG_COLOR_WHITE);
                     colorSwitch = false;
