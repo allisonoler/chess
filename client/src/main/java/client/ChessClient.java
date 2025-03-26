@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
@@ -16,6 +17,8 @@ import java.util.Collections;
 public class ChessClient {
     private String visitorName = null;
     private String visitorAuthToken = null;
+
+    private ChessGame currGame = null;
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
 
@@ -39,6 +42,8 @@ public class ChessClient {
                 case "join" -> join(params);
                 case "quit" -> "quit";
                 case "observe" -> observe(params);
+                case "leave" -> leave();
+                case "redraw" -> redraw();
                 default -> help();
             };
         } catch (ResponseException ex) {
@@ -50,6 +55,16 @@ public class ChessClient {
         }
     }
 //
+    public String redraw() throws ResponseException {
+        assertGameplay();
+        return drawBoard("WHITE");
+
+    }
+    public String leave() throws ResponseException {
+        assertGameplay();
+        state = State.SIGNEDIN;
+        return "You left the game.";
+    }
     public String login(String... params) throws ResponseException {
         if (params.length == 2) {
             LoginResult loginResult = server.login(new LoginRequest(params[0], params[1]));
@@ -106,6 +121,7 @@ public class ChessClient {
             state = State.GAMEPLAY;
             int gameNum = getGameNum(params[0]);
             server.join(new JoinRequest(visitorAuthToken, params[1], games.get(gameNum-1).gameID()));
+//            currGame = games.get(gameNum-1).gameID();
             return drawBoard(params[1]);
         }
         throw new ResponseException(400, "Invalid input");
