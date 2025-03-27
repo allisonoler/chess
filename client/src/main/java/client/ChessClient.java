@@ -20,12 +20,15 @@ public class ChessClient {
 
     private ChessGame currGame = null;
     private final ServerFacade server;
+
+//    private final WebSocketFacade webSocket;
     private State state = State.SIGNEDOUT;
 
     private ArrayList<GameData> games = null;
 
     public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
+//        webSocket = new WebSocketFacade(new)
     }
 
     public String eval(String input) {

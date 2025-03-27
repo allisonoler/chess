@@ -2,8 +2,9 @@ package client;
 
 import java.util.Scanner;
 import ui.EscapeSequences;
+import websocket.messages.ServerMessage;
 
-public class Repl {
+public class Repl implements ServerMessageHandler{
     private final ChessClient client;
     private State state;
     public Repl(String serverUrl) {
@@ -43,5 +44,9 @@ public class Repl {
     }
 
 
-
+    @Override
+    public void notify(ServerMessage serverMessage) {
+        System.out.println(serverMessage.getMessage());
+        printPrompt();
+    }
 }
