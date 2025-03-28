@@ -21,14 +21,17 @@ public class ChessClient {
     private ChessGame currGame = null;
     private final ServerFacade server;
 
-//    private final WebSocketFacade webSocket;
+    private WebSocketFacade ws;
+
+    private final ServerMessageHandler serverMessageHandler;
     private State state = State.SIGNEDOUT;
 
     private ArrayList<GameData> games = null;
 
-    public ChessClient(String serverUrl) {
+    public ChessClient(String serverUrl, ServerMessageHandler serverMessageHandler) throws ResponseException {
         server = new ServerFacade(serverUrl);
-//        webSocket = new WebSocketFacade(new)
+        this.serverMessageHandler = serverMessageHandler;
+        ws = new WebSocketFacade(serverUrl, serverMessageHandler);
     }
 
     public String eval(String input) {
@@ -135,6 +138,7 @@ public class ChessClient {
             assertSignedIn();
             state = State.GAMEPLAY;
             int gameNum = getGameNum(params[0]);
+            ws.connect(this.visitorAuthToken, params[0]);
             return drawBoard("WHITE");
         }
         throw new ResponseException(400, "Invalid input");

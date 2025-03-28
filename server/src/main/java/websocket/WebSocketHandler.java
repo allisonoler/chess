@@ -2,12 +2,9 @@ package websocket;
 
 import com.google.gson.Gson;
 import dataaccess.*;
-import exception.ResponseException;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import webSocketMessages.Action;
-import webSocketMessages.Notification;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
@@ -26,15 +23,16 @@ public class WebSocketHandler {
         switch (userGameCommand.getCommandType()) {
 //            case LOAD_GAME -> enter(action.visitorName(), session);
 //            case ERROR -> exit(action.visitorName());
-            case CONNECT -> enter(userGameCommand.getAuthToken(),session);
+            case CONNECT -> connect(userGameCommand.getAuthToken(), userGameCommand.getGameID(),session);
         }
     }
 
-    private void enter(String visitorName, Session session) throws IOException {
+    private void connect(String visitorName, int gameID, Session session) throws IOException {
         connections.add(visitorName, session);
         var message = String.format("%s is in the shop", visitorName);
         var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-        connections.broadcast(visitorName, notification);
+        notification.setMessage(visitorName + " joined the game.");
+        connections.broadcast(null, notification);
     }
 //
 //    private void exit(String visitorName) throws IOException {

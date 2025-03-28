@@ -7,8 +7,8 @@ import websocket.messages.ServerMessage;
 public class Repl implements ServerMessageHandler{
     private final ChessClient client;
     private State state;
-    public Repl(String serverUrl) {
-        client = new ChessClient(serverUrl);
+    public Repl(String serverUrl) throws ResponseException {
+        client = new ChessClient(serverUrl, this);
     }
 
     public void run() {
