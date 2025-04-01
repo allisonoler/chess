@@ -1,7 +1,6 @@
 package client;
 
 import com.google.gson.Gson;
-import websocket.*;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 

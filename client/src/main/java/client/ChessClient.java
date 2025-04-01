@@ -138,7 +138,7 @@ public class ChessClient {
             assertSignedIn();
             state = State.GAMEPLAY;
             int gameNum = getGameNum(params[0]);
-            ws.connect(this.visitorAuthToken, params[0]);
+            ws.connect(this.visitorName, params[0]);
             return drawBoard("WHITE");
         }
         throw new ResponseException(400, "Invalid input");

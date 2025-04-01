@@ -32,7 +32,8 @@ public class WebSocketHandler {
         var message = String.format("%s is in the shop", visitorName);
         var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
         notification.setMessage(visitorName + " joined the game.");
-        connections.broadcast(null, notification);
+//        session.getRemote().sendString("we got here!");
+        connections.broadcast(visitorName, notification);
     }
 //
 //    private void exit(String visitorName) throws IOException {
