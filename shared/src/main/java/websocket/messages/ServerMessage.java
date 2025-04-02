@@ -33,6 +33,8 @@ public class ServerMessage {
         return this.message;
     }
 
+
+
     public void setMessage(String message) {
         this.message = message;
     }

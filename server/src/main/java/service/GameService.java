@@ -49,4 +49,8 @@ public class GameService {
         games = gameDOA.listGame();
         return new ListResult(games);
     }
+
+    public GameData getGame(String authToken, String gameID) throws DataAccessException {
+        return gameDOA.getGame(gameID);
+    }
 }

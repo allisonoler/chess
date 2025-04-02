@@ -28,6 +28,8 @@ public class ChessClient {
 
     private ArrayList<GameData> games = null;
 
+    private int gameID = 0;
+
     public ChessClient(String serverUrl, ServerMessageHandler serverMessageHandler) throws ResponseException {
         server = new ServerFacade(serverUrl);
         this.serverMessageHandler = serverMessageHandler;
@@ -50,6 +52,7 @@ public class ChessClient {
                 case "observe" -> observe(params);
                 case "leave" -> leave();
                 case "redraw" -> redraw();
+                case "move" -> makeMove(params);
                 default -> help();
             };
         } catch (ResponseException ex) {
@@ -63,7 +66,9 @@ public class ChessClient {
 //
     public String redraw() throws ResponseException {
         assertGameplay();
-        return drawBoard("WHITE");
+        ChessBoard board = new ChessBoard();
+        board.resetBoard();
+        return drawBoard("WHITE", board);
 
     }
     public String leave() throws ResponseException {
@@ -121,14 +126,41 @@ public class ChessClient {
         throw new ResponseException(400, "Invalid input");
     }
 
+    private boolean validateMoveInput(String input) throws ResponseException {
+        try {
+            String letter = input.substring(0, 1);
+            int digit = Integer.parseInt(input.substring(1));
+            if ((letter.equals("a") || letter.equals("b") || letter.equals("c") || letter.equals("d") || letter.equals("e")
+                    || letter.equals("f") || letter.equals("g") || letter.equals("h")) && digit > 0 && digit < 9) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            throw new ResponseException(400, "Invalid input");
+        }
+    }
+
+    public String makeMove(String... params) throws ResponseException {
+        if (params.length == 2 && validateMoveInput(params[0]) && validateMoveInput(params[1])) {
+            assertGameplay();
+//            int gameNum = getGameNum(params[0]);
+            ws.makeMove(this.visitorName, this.visitorAuthToken, params[0], params[1], gameID);
+        }
+        throw new ResponseException(400, "Invalid input");
+    }
+
     public String join(String... params) throws ResponseException {
         if (params.length == 2 && (params[1].equals("WHITE") || params[1].equals("BLACK"))) {
             assertSignedIn();
             state = State.GAMEPLAY;
+            gameID = Integer.valueOf(games.get(getGameNum(params[0])-1).gameID());
             int gameNum = getGameNum(params[0]);
-            server.join(new JoinRequest(visitorAuthToken, params[1], games.get(gameNum-1).gameID()));
-//            currGame = games.get(gameNum-1).gameID();
-            return drawBoard(params[1]);
+            server.join(new JoinRequest(visitorAuthToken, params[1], String.valueOf(gameID)));
+            ws.join(this.visitorName, this.visitorAuthToken, String.valueOf(gameID), params[1]);
+            ChessBoard board = new ChessBoard();
+            board.resetBoard();
+            return drawBoard(params[1], board);
         }
         throw new ResponseException(400, "Invalid input");
     }
@@ -136,10 +168,12 @@ public class ChessClient {
     public String observe(String... params) throws ResponseException {
         if (params.length == 1) {
             assertSignedIn();
+            gameID = Integer.valueOf(games.get(getGameNum(params[0])).gameID());
             state = State.GAMEPLAY;
-            int gameNum = getGameNum(params[0]);
-            ws.connect(this.visitorName, params[0]);
-            return drawBoard("WHITE");
+            ws.connect(this.visitorName, this.visitorAuthToken, params[0]);
+            ChessBoard board = new ChessBoard();
+            board.resetBoard();
+            return drawBoard("WHITE", board);
         }
         throw new ResponseException(400, "Invalid input");
     }
@@ -191,10 +225,10 @@ public class ChessClient {
         return result.toString();
     }
 
-    public String drawBoard(String playerColor) {
+    public static String drawBoard(String playerColor, ChessBoard board) {
         StringBuilder returnResult = new StringBuilder();
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();
+//        ChessBoard board = new ChessBoard();
+//        board.resetBoard();
         boolean colorSwitch = true;
         String columnLabel = "    a  b  c  d  e  f  g  h    ";
         ArrayList<Integer> rows = new ArrayList<Integer>();
@@ -268,7 +302,7 @@ public class ChessClient {
             return """
                     redraw - the chessboard
                     leave - the game
-                    move <POSITION> (ex: a4) - make move
+                    move <POSITION> <POSITION>(ex: a4 f8) - make move
                     resign - give up in game
                     leave - leave game
                     highlight <POSITION> (ex: a4) - highlights all valid squares for selected piece

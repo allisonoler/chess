@@ -13,10 +13,10 @@ public class Server {
     GameDOA gameDOA;
     UserDOA userDOA;
     AuthDOA authDOA;
-    UserService userService;
-    ClearService clearService;
+    public static UserService userService;
+   ClearService clearService;
 
-    GameService gameService;
+    public static GameService gameService;
 
     private final WebSocketHandler webSocketHandler;
 

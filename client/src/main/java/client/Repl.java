@@ -1,6 +1,9 @@
 package client;
 
 import java.util.Scanner;
+
+import chess.ChessBoard;
+import com.google.gson.Gson;
 import ui.EscapeSequences;
 import websocket.messages.ServerMessage;
 
@@ -46,7 +49,12 @@ public class Repl implements ServerMessageHandler{
 
     @Override
     public void notify(ServerMessage serverMessage) {
-        System.out.println(serverMessage.getMessage());
+        if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+            ChessBoard board = new Gson().fromJson(serverMessage.getMessage(), ChessBoard.class);
+            System.out.println(ChessClient.drawBoard("WHITE", board));
+        } else {
+            System.out.println(serverMessage.getMessage());
+        }
         printPrompt();
     }
 }

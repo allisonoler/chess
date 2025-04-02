@@ -1,5 +1,7 @@
 package client;
 
+import chess.ChessMove;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
@@ -52,9 +54,36 @@ public class WebSocketFacade extends Endpoint {
 //        }
 //    }
 
-    public void connect(String authtoken, String gameID) throws ResponseException {
+    public void makeMove(String visitorName, String authtoken, String startString, String endString, Integer gameID) throws ResponseException {
         try {
-            var userGameCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authtoken, Integer.valueOf(gameID));
+            char letter1 = startString.charAt(0);
+            int endpos1 = (int)(startString.charAt(1)-'0');
+            int startpos1 = letter1 - 'a' + 1;
+            char letter2 = endString.charAt(0);
+            int endpos2 = (int)(endString.charAt(1)-'0');
+            int startpos2 = letter2 - 'a' + 1;
+
+            ChessMove chessMove = new ChessMove(new ChessPosition(endpos1, startpos1), new ChessPosition(endpos2, startpos2), null);
+            var userGameCommand = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, visitorName, authtoken, Integer.valueOf(gameID), null);
+            userGameCommand.setMove(chessMove);
+            this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
+        } catch (Exception e) {
+            throw new ResponseException(500, e.getMessage());
+        }
+    }
+
+    public void connect(String visitorName, String authtoken, String gameID) throws ResponseException {
+        try {
+            var userGameCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, visitorName, authtoken, Integer.valueOf(gameID), null);
+            this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
+        } catch (IOException ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
+    }
+
+    public void join(String visitorName, String authtoken, String gameID, String color) throws ResponseException {
+        try {
+            var userGameCommand = new UserGameCommand(UserGameCommand.CommandType.JOIN, visitorName, authtoken, Integer.valueOf(gameID), color);
             this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
