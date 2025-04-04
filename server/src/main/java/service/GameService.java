@@ -53,4 +53,8 @@ public class GameService {
     public GameData getGame(String authToken, String gameID) throws DataAccessException {
         return gameDOA.getGame(gameID);
     }
+
+    public void updateGame(String authToken, String gameID, GameData gameData) throws DataAccessException {
+        gameDOA.updateGame(gameID, gameData);
+    }
 }

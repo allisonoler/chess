@@ -51,6 +51,7 @@ public class Repl implements ServerMessageHandler{
     public void notify(ServerMessage serverMessage) {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
             ChessBoard board = new Gson().fromJson(serverMessage.getMessage(), ChessBoard.class);
+            System.out.println();
             System.out.println(ChessClient.drawBoard("WHITE", board));
         } else {
             System.out.println(serverMessage.getMessage());

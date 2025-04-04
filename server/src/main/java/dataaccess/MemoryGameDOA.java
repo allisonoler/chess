@@ -61,4 +61,13 @@ public class MemoryGameDOA implements GameDOA {
         }
         return null;
     }
+
+    @Override
+    public void updateGame(String id, GameData g) throws DataAccessException {
+        for (int i = 0; i < games.size(); i++) {
+            if (games.get(i).gameID().equals(id)) {
+                games.set(i, g);
+            }
+        }
+    }
 }

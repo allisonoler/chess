@@ -19,4 +19,6 @@ public interface GameDOA {
     boolean empty();
 
     GameData getGame(String id) throws DataAccessException;
+
+    void updateGame(String id, GameData g) throws DataAccessException;
 }

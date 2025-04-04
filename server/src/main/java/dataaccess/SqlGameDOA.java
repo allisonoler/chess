@@ -110,4 +110,11 @@ public class SqlGameDOA implements GameDOA {
         }
         return null;
     }
+
+    @Override
+    public void updateGame(String id, GameData g) throws DataAccessException {
+//        var statement = "UPDATE game SET (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?) WHERE gameID = ?";
+        var statement = "UPDATE game SET gameID=?, whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
+        DatabaseManager.executeUpdate(statement, g.gameID(), g.whiteUsername(), g.blackUsername(), g.gameName(), g.game(), g.gameID());
+    }
 }

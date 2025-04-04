@@ -29,8 +29,8 @@ public class WebSocketHandler {
         switch (userGameCommand.getCommandType()) {
 //            case LOAD_GAME -> enter(action.visitorName(), session);
 //            case ERROR -> exit(action.visitorName());
-            case CONNECT -> connect(userGameCommand.getName(), userGameCommand.getGameID(),session);
-            case JOIN -> join(userGameCommand.getName(), userGameCommand.getGameID(),  userGameCommand.getColor(),session);
+            case CONNECT -> connect(userGameCommand.getName(), userGameCommand.getGameID(),session, userGameCommand.getAuthToken());
+            case JOIN -> join(userGameCommand.getName(), userGameCommand.getGameID(),  userGameCommand.getColor(),session, userGameCommand.getAuthToken());
             case MAKE_MOVE -> makeMove(userGameCommand.getMove(), userGameCommand.getName(), userGameCommand.getColor(), userGameCommand.getGameID(), userGameCommand.getAuthToken());
         }
     }
@@ -39,10 +39,31 @@ public class WebSocketHandler {
         var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
         GameData gameData = Server.gameService.getGame(authToken, String.valueOf(gameID));
         ChessGame game = gameData.game();
+        if ((color.equals("WHITE") && game.getTeamTurn().equals(ChessGame.TeamColor.BLACK)) || (color.equals("BLACK") && game.getTeamTurn().equals(ChessGame.TeamColor.WHITE))) {
+            notification.setMessage("It is not your turn.");
+            connections.sendOne(visitorName, notification);
+            return;
+        }
         try {
             game.makeMove(chessMove);
+            Server.gameService.updateGame(authToken, gameData.gameID(), new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
             notification.setMessage(visitorName + "made the move: " + chessMove.toString());
             connections.broadcast(null, gameID, notification);
+            if ((game.isInCheck(ChessGame.TeamColor.WHITE) && color.equals("WHITE")) || (game.isInCheck(ChessGame.TeamColor.BLACK) && color.equals("BLACK"))) {
+                notification= new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+                notification.setMessage(color + " is in check!");
+                connections.broadcast(null, gameID, notification);
+            }
+            if ((game.isInCheckmate(ChessGame.TeamColor.WHITE) && color.equals("WHITE")) || (game.isInCheckmate(ChessGame.TeamColor.BLACK) && color.equals("BLACK"))) {
+                notification= new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+                notification.setMessage(color + " is in checkmate!");
+                connections.broadcast(null, gameID, notification);
+            }
+            if ((game.isInStalemate(ChessGame.TeamColor.WHITE) && color.equals("WHITE")) || (game.isInStalemate(ChessGame.TeamColor.BLACK) && color.equals("BLACK"))) {
+                notification= new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+                notification.setMessage(color + " is in stalemate!");
+                connections.broadcast(null, gameID, notification);
+            }
             var notification2 = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
             notification2.setMessage(new Gson().toJson(game.getBoard()));
             connections.broadcast(null, gameID, notification2);
@@ -52,21 +73,31 @@ public class WebSocketHandler {
         }
     }
 
-    private void connect(String visitorName, int gameID, Session session) throws IOException {
+    private void connect(String visitorName, int gameID, Session session, String authToken) throws IOException, DataAccessException {
         connections.add(visitorName, gameID, session);
         var message = String.format("%s is in the shop", visitorName);
         var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
         notification.setMessage(visitorName + " joined the game.");
 //        session.getRemote().sendString("we got here!");
         connections.broadcast(visitorName, gameID, notification);
+        GameData gameData = Server.gameService.getGame(authToken, String.valueOf(gameID));
+        ChessGame game = gameData.game();
+        var notification2 = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
+        notification2.setMessage(new Gson().toJson(game.getBoard()));
+        connections.broadcast(null, gameID, notification2);
     }
 
-    private void join(String visitorName, int gameID, String color, Session session) throws IOException {
+    private void join(String visitorName, int gameID, String color, Session session, String authToken) throws IOException, DataAccessException {
         connections.add(visitorName, gameID, session);
         var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
         notification.setMessage(visitorName + " joined the game as " + color + ".");
 //        session.getRemote().sendString("we got here!");
         connections.broadcast(visitorName, gameID, notification);
+        GameData gameData = Server.gameService.getGame(authToken, String.valueOf(gameID));
+        ChessGame game = gameData.game();
+        var notification2 = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
+        notification2.setMessage(new Gson().toJson(game.getBoard()));
+        connections.broadcast(null, gameID, notification2);
     }
 //
 //    private void exit(String visitorName) throws IOException {

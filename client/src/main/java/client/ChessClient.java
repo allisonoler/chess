@@ -17,8 +17,6 @@ import java.util.Collections;
 public class ChessClient {
     private String visitorName = null;
     private String visitorAuthToken = null;
-
-    private ChessGame currGame = null;
     private final ServerFacade server;
 
     private WebSocketFacade ws;
@@ -146,6 +144,7 @@ public class ChessClient {
             assertGameplay();
 //            int gameNum = getGameNum(params[0]);
             ws.makeMove(this.visitorName, this.visitorAuthToken, params[0], params[1], gameID);
+            return "";
         }
         throw new ResponseException(400, "Invalid input");
     }
@@ -158,9 +157,10 @@ public class ChessClient {
             int gameNum = getGameNum(params[0]);
             server.join(new JoinRequest(visitorAuthToken, params[1], String.valueOf(gameID)));
             ws.join(this.visitorName, this.visitorAuthToken, String.valueOf(gameID), params[1]);
-            ChessBoard board = new ChessBoard();
-            board.resetBoard();
-            return drawBoard(params[1], board);
+//            ChessBoard board = new ChessBoard();
+//            board.resetBoard();
+//            return drawBoard(params[1], board);
+            return "";
         }
         throw new ResponseException(400, "Invalid input");
     }
@@ -168,12 +168,13 @@ public class ChessClient {
     public String observe(String... params) throws ResponseException {
         if (params.length == 1) {
             assertSignedIn();
-            gameID = Integer.valueOf(games.get(getGameNum(params[0])).gameID());
+            gameID = Integer.valueOf(games.get(getGameNum(params[0])-1).gameID());
             state = State.GAMEPLAY;
-            ws.connect(this.visitorName, this.visitorAuthToken, params[0]);
-            ChessBoard board = new ChessBoard();
-            board.resetBoard();
-            return drawBoard("WHITE", board);
+            ws.connect(this.visitorName, this.visitorAuthToken, String.valueOf(gameID));
+//            ChessBoard board = new ChessBoard();
+//            board.resetBoard();
+//            return drawBoard("WHITE", board);
+            return "";
         }
         throw new ResponseException(400, "Invalid input");
     }
@@ -227,8 +228,6 @@ public class ChessClient {
 
     public static String drawBoard(String playerColor, ChessBoard board) {
         StringBuilder returnResult = new StringBuilder();
-//        ChessBoard board = new ChessBoard();
-//        board.resetBoard();
         boolean colorSwitch = true;
         String columnLabel = "    a  b  c  d  e  f  g  h    ";
         ArrayList<Integer> rows = new ArrayList<Integer>();
