@@ -12,6 +12,7 @@ import java.util.Collection;
 public class ChessGame {
     private TeamColor teamColor;
     private ChessBoard board;
+    private boolean resigned;
 
 
 
@@ -26,6 +27,14 @@ public class ChessGame {
      */
     public TeamColor getTeamTurn() {
         return teamColor;
+    }
+
+    public boolean isResigned() {
+        return resigned;
+    }
+
+    public void setResigned(boolean resigned) {
+        this.resigned = resigned;
     }
 
     /**

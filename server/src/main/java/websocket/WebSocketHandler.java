@@ -33,7 +33,23 @@ public class WebSocketHandler {
             case JOIN -> join(userGameCommand.getName(), userGameCommand.getGameID(),  userGameCommand.getColor(),session, userGameCommand.getAuthToken());
             case MAKE_MOVE -> makeMove(userGameCommand.getMove(), userGameCommand.getName(), userGameCommand.getColor(), userGameCommand.getGameID(), userGameCommand.getAuthToken());
             case REDRAW -> redraw(userGameCommand.getGameID(), userGameCommand.getAuthToken());
+            case LEAVE -> leave(userGameCommand.getGameID(), userGameCommand.getAuthToken(), userGameCommand.getName());
         }
+    }
+
+    private void leave(Integer gameID, String authToken, String name) throws DataAccessException, IOException {
+        GameData gameData = Server.gameService.getGame(authToken, String.valueOf(gameID));
+        ChessGame game = gameData.game();
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        if (name.equals(gameData.whiteUsername())) {
+            Server.gameService.updateGame(authToken, gameData.gameID(), new GameData(gameData.gameID(), null, gameData.blackUsername(), gameData.gameName(), game));
+        }
+        else if (name.equals(gameData.blackUsername())) {
+            Server.gameService.updateGame(authToken, gameData.gameID(), new GameData(gameData.gameID(), gameData.whiteUsername(), null, gameData.gameName(), game));
+        }
+        notification.setMessage(name + " left the game.");
+        connections.broadcast(name,gameID, notification);
+        connections.remove(name);
     }
 
     private void redraw(Integer gameID, String authToken) throws DataAccessException, IOException {

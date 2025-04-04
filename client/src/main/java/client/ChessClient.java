@@ -73,6 +73,8 @@ public class ChessClient {
     public String leave() throws ResponseException {
         assertGameplay();
         state = State.SIGNEDIN;
+        ws.leave(visitorName, visitorAuthToken, String.valueOf(gameID), null);
+        gameID=0;
         return "You left the game.";
     }
     public String login(String... params) throws ResponseException {
