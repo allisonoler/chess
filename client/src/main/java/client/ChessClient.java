@@ -64,10 +64,11 @@ public class ChessClient {
 //
     public String redraw() throws ResponseException {
         assertGameplay();
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();
-        return drawBoard("WHITE", board);
-
+//        ChessBoard board = new ChessBoard();
+//        board.resetBoard();
+//        return drawBoard("WHITE", board);
+        ws.redraw(this.visitorName, this.visitorAuthToken, String.valueOf(gameID), null);
+        return "";
     }
     public String leave() throws ResponseException {
         assertGameplay();
@@ -194,6 +195,10 @@ public class ChessClient {
 
     public State getState() {
         return state;
+    }
+
+    public String getVisitorName() {
+        return visitorName;
     }
 
     public String list() throws client.ResponseException, URISyntaxException, IOException {

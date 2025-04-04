@@ -89,6 +89,15 @@ public class WebSocketFacade extends Endpoint {
             throw new ResponseException(500, ex.getMessage());
         }
     }
+
+    public void redraw(String visitorName, String authtoken, String gameID, String color) throws ResponseException {
+        try {
+            var userGameCommand = new UserGameCommand(UserGameCommand.CommandType.REDRAW, visitorName, authtoken, Integer.valueOf(gameID), color);
+            this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
+        } catch (IOException ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
+    }
 //
 //    public void leavePetShop(String visitorName) throws ResponseException {
 //        try {

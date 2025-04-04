@@ -32,15 +32,29 @@ public class WebSocketHandler {
             case CONNECT -> connect(userGameCommand.getName(), userGameCommand.getGameID(),session, userGameCommand.getAuthToken());
             case JOIN -> join(userGameCommand.getName(), userGameCommand.getGameID(),  userGameCommand.getColor(),session, userGameCommand.getAuthToken());
             case MAKE_MOVE -> makeMove(userGameCommand.getMove(), userGameCommand.getName(), userGameCommand.getColor(), userGameCommand.getGameID(), userGameCommand.getAuthToken());
+            case REDRAW -> redraw(userGameCommand.getGameID(), userGameCommand.getAuthToken());
         }
+    }
+
+    private void redraw(Integer gameID, String authToken) throws DataAccessException, IOException {
+        GameData gameData = Server.gameService.getGame(authToken, String.valueOf(gameID));
+        ChessGame game = gameData.game();
+        var notification2 = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
+        notification2.setMessage(new Gson().toJson(Server.gameService.getGame(authToken, String.valueOf(gameID))));
+        connections.broadcast(null, gameID, notification2);
     }
 
     private void makeMove(ChessMove chessMove,String visitorName, String color, Integer gameID, String authToken) throws IOException, DataAccessException {
         var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
         GameData gameData = Server.gameService.getGame(authToken, String.valueOf(gameID));
         ChessGame game = gameData.game();
-        if ((color.equals("WHITE") && game.getTeamTurn().equals(ChessGame.TeamColor.BLACK)) || (color.equals("BLACK") && game.getTeamTurn().equals(ChessGame.TeamColor.WHITE))) {
-            notification.setMessage("It is not your turn.");
+        if (!((game.getTeamTurn().equals(ChessGame.TeamColor.BLACK) && gameData.blackUsername().equals(visitorName)) ||  (game.getTeamTurn().equals(ChessGame.TeamColor.WHITE) && gameData.whiteUsername().equals(visitorName)))) {
+            if (!(gameData.blackUsername().equals(visitorName) || gameData.whiteUsername().equals(visitorName))) {
+                notification.setMessage("You are observing.");
+            }
+            else {
+                notification.setMessage("It is not your turn.");
+            }
             connections.sendOne(visitorName, notification);
             return;
         }
@@ -65,7 +79,7 @@ public class WebSocketHandler {
                 connections.broadcast(null, gameID, notification);
             }
             var notification2 = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
-            notification2.setMessage(new Gson().toJson(game.getBoard()));
+            notification2.setMessage(new Gson().toJson(Server.gameService.getGame(authToken, String.valueOf(gameID))));
             connections.broadcast(null, gameID, notification2);
         } catch (InvalidMoveException e) {
             notification.setMessage("Invalid move, please try again.");
@@ -81,10 +95,9 @@ public class WebSocketHandler {
 //        session.getRemote().sendString("we got here!");
         connections.broadcast(visitorName, gameID, notification);
         GameData gameData = Server.gameService.getGame(authToken, String.valueOf(gameID));
-        ChessGame game = gameData.game();
         var notification2 = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
-        notification2.setMessage(new Gson().toJson(game.getBoard()));
-        connections.broadcast(null, gameID, notification2);
+        notification2.setMessage(new Gson().toJson(gameData));
+        connections.sendOne(visitorName, notification2);
     }
 
     private void join(String visitorName, int gameID, String color, Session session, String authToken) throws IOException, DataAccessException {
@@ -94,10 +107,9 @@ public class WebSocketHandler {
 //        session.getRemote().sendString("we got here!");
         connections.broadcast(visitorName, gameID, notification);
         GameData gameData = Server.gameService.getGame(authToken, String.valueOf(gameID));
-        ChessGame game = gameData.game();
         var notification2 = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
-        notification2.setMessage(new Gson().toJson(game.getBoard()));
-        connections.broadcast(null, gameID, notification2);
+        notification2.setMessage(new Gson().toJson(gameData));
+        connections.sendOne(visitorName, notification2);
     }
 //
 //    private void exit(String visitorName) throws IOException {

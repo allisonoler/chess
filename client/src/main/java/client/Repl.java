@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import chess.ChessBoard;
 import com.google.gson.Gson;
+import model.GameData;
 import ui.EscapeSequences;
 import websocket.messages.ServerMessage;
 
@@ -50,9 +51,13 @@ public class Repl implements ServerMessageHandler{
     @Override
     public void notify(ServerMessage serverMessage) {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-            ChessBoard board = new Gson().fromJson(serverMessage.getMessage(), ChessBoard.class);
+            GameData game = new Gson().fromJson(serverMessage.getMessage(), GameData.class);
             System.out.println();
-            System.out.println(ChessClient.drawBoard("WHITE", board));
+            String playerColor = "WHITE";
+            if (game.blackUsername().equals(client.getVisitorName())) {
+                playerColor = "BLACK";
+            }
+            System.out.println(ChessClient.drawBoard(playerColor, game.game().getBoard()));
         } else {
             System.out.println(serverMessage.getMessage());
         }

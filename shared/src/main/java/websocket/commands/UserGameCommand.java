@@ -38,7 +38,9 @@ public class UserGameCommand {
         JOIN,
         MAKE_MOVE,
         LEAVE,
-        RESIGN
+        RESIGN,
+
+        REDRAW
     }
 
     public void setMove(ChessMove move) {
