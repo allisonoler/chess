@@ -51,7 +51,8 @@ public class Repl implements ServerMessageHandler{
     @Override
     public void notify(ServerMessage serverMessage) {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-            GameData game = new Gson().fromJson(serverMessage.getMessage(), GameData.class);
+//            GameData game = new Gson().fromJson(serverMessage.getMessage(), GameData.class);
+            GameData game = serverMessage.getGame();
             System.out.println();
             String playerColor = "WHITE";
             if (game.blackUsername() != null && game.blackUsername().equals(client.getVisitorName())) {

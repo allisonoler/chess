@@ -28,6 +28,8 @@ public class ChessClient {
 
     private int gameID = 0;
 
+    private GameData currGame = null;
+
     public ChessClient(String serverUrl, ServerMessageHandler serverMessageHandler) throws ResponseException {
         server = new ServerFacade(serverUrl);
         this.serverMessageHandler = serverMessageHandler;
@@ -51,6 +53,7 @@ public class ChessClient {
                 case "leave" -> leave();
                 case "redraw" -> redraw();
                 case "move" -> makeMove(params);
+                case "resign" -> resign();
                 default -> help();
             };
         } catch (ResponseException ex) {
@@ -62,13 +65,18 @@ public class ChessClient {
         }
     }
 //
+
+    public String resign() throws ResponseException {
+        assertGameplay();
+        ws.resign(this.visitorName, this.visitorAuthToken, String.valueOf(gameID));
+        return "";
+    }
     public String redraw() throws ResponseException {
         assertGameplay();
 //        ChessBoard board = new ChessBoard();
 //        board.resetBoard();
 //        return drawBoard("WHITE", board);
-        ws.redraw(this.visitorName, this.visitorAuthToken, String.valueOf(gameID), null);
-        return "";
+        return redrawBoard();
     }
     public String leave() throws ResponseException {
         assertGameplay();
@@ -159,7 +167,7 @@ public class ChessClient {
             gameID = Integer.valueOf(games.get(getGameNum(params[0])-1).gameID());
             int gameNum = getGameNum(params[0]);
             server.join(new JoinRequest(visitorAuthToken, params[1], String.valueOf(gameID)));
-            ws.join(this.visitorName, this.visitorAuthToken, String.valueOf(gameID), params[1]);
+            ws.connect(this.visitorName, this.visitorAuthToken, String.valueOf(gameID));
 //            ChessBoard board = new ChessBoard();
 //            board.resetBoard();
 //            return drawBoard(params[1], board);
@@ -231,6 +239,14 @@ public class ChessClient {
             index++;
         }
         return result.toString();
+    }
+
+    private String redrawBoard() {
+        String playerColor = "WHITE";
+        if (currGame.blackUsername() != null && currGame.blackUsername().equals(visitorName)) {
+            playerColor = "BLACK";
+        }
+        return drawBoard(playerColor, currGame.game().getBoard());
     }
 
     public static String drawBoard(String playerColor, ChessBoard board) {

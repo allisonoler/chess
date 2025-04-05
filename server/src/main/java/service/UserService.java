@@ -68,4 +68,12 @@ public class UserService {
             throw new DataAccessException(e.getMessage());
         }
     }
+
+    public String getUser(String authToken) throws DataAccessException {
+        try {
+            return authDOA.getAuth(authToken).username();
+        } catch (DataAccessException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+    }
 }
