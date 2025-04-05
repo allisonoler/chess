@@ -93,7 +93,8 @@ public class WebSocketHandler {
             connections.sendOne(visitorName, notification);
             return;
         }
-        if (!((game.getTeamTurn().equals(ChessGame.TeamColor.BLACK) && gameData.blackUsername().equals(visitorName)) ||  (game.getTeamTurn().equals(ChessGame.TeamColor.WHITE) && gameData.whiteUsername().equals(visitorName)))) {
+        if (!((game.getTeamTurn().equals(ChessGame.TeamColor.BLACK) && gameData.blackUsername().equals(visitorName)) ||
+                (game.getTeamTurn().equals(ChessGame.TeamColor.WHITE) && gameData.whiteUsername().equals(visitorName)))) {
             if (!(gameData.blackUsername().equals(visitorName) || gameData.whiteUsername().equals(visitorName))) {
                 notification = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
                 notification.setErrorMessage("Error: You are observing.");
