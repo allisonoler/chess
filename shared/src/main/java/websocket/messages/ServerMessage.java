@@ -11,7 +11,7 @@ import java.util.Objects;
  * methods.
  */
 public class ServerMessage {
-    public static Object Type;
+    public static Object type;
     ServerMessageType serverMessageType;
 
     private String message;

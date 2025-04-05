@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import chess.ChessBoard;
-import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
@@ -73,9 +72,6 @@ public class ChessClient {
     }
     public String redraw() throws ResponseException {
         assertGameplay();
-//        ChessBoard board = new ChessBoard();
-//        board.resetBoard();
-//        return drawBoard("WHITE", board);
         return redrawBoard();
     }
     public String leave() throws ResponseException {
@@ -90,8 +86,6 @@ public class ChessClient {
             LoginResult loginResult = server.login(new LoginRequest(params[0], params[1]));
             state = State.SIGNEDIN;
             visitorName = params[0];
-//            ws = new WebSocketFacade(serverUrl, notificationHandler);
-//            ws.enterPetShop(visitorName);
             visitorAuthToken = loginResult.authToken();
             return String.format("You signed in as %s.", params[0]);
         }
@@ -153,7 +147,6 @@ public class ChessClient {
     public String makeMove(String... params) throws ResponseException {
         if (params.length == 2 && validateMoveInput(params[0]) && validateMoveInput(params[1])) {
             assertGameplay();
-//            int gameNum = getGameNum(params[0]);
             ws.makeMove(this.visitorName, this.visitorAuthToken, params[0], params[1], gameID);
             return "";
         }
@@ -168,9 +161,6 @@ public class ChessClient {
             int gameNum = getGameNum(params[0]);
             server.join(new JoinRequest(visitorAuthToken, params[1], String.valueOf(gameID)));
             ws.connect(this.visitorName, this.visitorAuthToken, String.valueOf(gameID));
-//            ChessBoard board = new ChessBoard();
-//            board.resetBoard();
-//            return drawBoard(params[1], board);
             return "";
         }
         throw new ResponseException(400, "Invalid input");
@@ -182,9 +172,6 @@ public class ChessClient {
             gameID = Integer.valueOf(games.get(getGameNum(params[0])-1).gameID());
             state = State.GAMEPLAY;
             ws.connect(this.visitorName, this.visitorAuthToken, String.valueOf(gameID));
-//            ChessBoard board = new ChessBoard();
-//            board.resetBoard();
-//            return drawBoard("WHITE", board);
             return "";
         }
         throw new ResponseException(400, "Invalid input");

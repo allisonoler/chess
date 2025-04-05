@@ -45,15 +45,6 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-//    public void loadGame() throws ResponseException {
-//        try {
-//            var action = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
-//            this.session.getBasicRemote().sendText(new Gson().toJson(action));
-//        } catch (IOException ex) {
-//            throw new ResponseException(500, ex.getMessage());
-//        }
-//    }
-
     public void makeMove(String visitorName, String authtoken, String startString, String endString, Integer gameID) throws ResponseException {
         try {
             char letter1 = startString.charAt(0);
@@ -81,24 +72,6 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-//    public void join(String visitorName, String authtoken, String gameID, String color) throws ResponseException {
-//        try {
-//            var userGameCommand = new UserGameCommand(UserGameCommand.CommandType.JOIN, visitorName, authtoken, Integer.valueOf(gameID), color);
-//            this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
-//        } catch (IOException ex) {
-//            throw new ResponseException(500, ex.getMessage());
-//        }
-//    }
-
-//    public void redraw(String visitorName, String authtoken, String gameID, String color) throws ResponseException {
-//        try {
-//            var userGameCommand = new UserGameCommand(UserGameCommand.CommandType.REDRAW, visitorName, authtoken, Integer.valueOf(gameID), color);
-//            this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
-//        } catch (IOException ex) {
-//            throw new ResponseException(500, ex.getMessage());
-//        }
-//    }
-
     public void leave(String visitorName, String authtoken, String gameID, String color) throws ResponseException {
         try {
             var userGameCommand = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authtoken, Integer.valueOf(gameID));
@@ -116,15 +89,4 @@ public class WebSocketFacade extends Endpoint {
             throw new ResponseException(500, ex.getMessage());
         }
     }
-//
-//    public void leavePetShop(String visitorName) throws ResponseException {
-//        try {
-//            var action = new Action(Action.Type.EXIT, visitorName);
-//            this.session.getBasicRemote().sendText(new Gson().toJson(action));
-//            this.session.close();
-//        } catch (IOException ex) {
-//            throw new ResponseException(500, ex.getMessage());
-//        }
-//    }
-
 }
