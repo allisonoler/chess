@@ -50,18 +50,23 @@ public class Repl implements ServerMessageHandler{
 
     @Override
     public void notify(ServerMessage serverMessage) {
-        if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-//            GameData game = new Gson().fromJson(serverMessage.getMessage(), GameData.class);
-            GameData game = serverMessage.getGame();
-            System.out.println();
-            String playerColor = "WHITE";
-            if (game.blackUsername() != null && game.blackUsername().equals(client.getVisitorName())) {
-                playerColor = "BLACK";
-            }
-            System.out.println(ChessClient.drawBoard(playerColor, game.game().getBoard()));
-        } else {
-            System.out.println(serverMessage.getMessage());
+        switch (serverMessage.getServerMessageType()) {
+            case LOAD_GAME -> loadGame(serverMessage);
+            case ERROR -> System.out.println(serverMessage.getErrorMessage());
+            case NOTIFICATION -> System.out.println(serverMessage.getMessage());
         }
         printPrompt();
     }
+
+    private void loadGame(ServerMessage serverMessage) {
+//        GameData game = new Gson().fromJson(serverMessage.getMessage(), GameData.class);
+        GameData game = serverMessage.getGame();
+        System.out.println();
+        String playerColor = "WHITE";
+        if (game.blackUsername() != null && game.blackUsername().equals(client.getVisitorName())) {
+            playerColor = "BLACK";
+        }
+        System.out.println(ChessClient.drawBoard(playerColor, game.game().getBoard()));
+    }
 }
+

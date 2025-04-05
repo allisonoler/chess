@@ -27,26 +27,13 @@ public class WebSocketHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException, DataAccessException {
         UserGameCommand userGameCommand = new Gson().fromJson(message, UserGameCommand.class);
-//        if (userGameCommand.getGameID() == null || userGameCommand.getAuthToken() == null) {
-//            error(userGameCommand.getName());
-//        }
         switch (userGameCommand.getCommandType()) {
-//            case LOAD_GAME -> enter(action.visitorName(), session);
-//            case ERROR -> exit(action.visitorName());
             case CONNECT -> connect(userGameCommand.getGameID(),session, userGameCommand.getAuthToken());
-//            case JOIN -> join(userGameCommand.getName(), userGameCommand.getGameID(),  userGameCommand.getColor(),session, userGameCommand.getAuthToken());
-            case MAKE_MOVE -> makeMove(userGameCommand.getMove(), userGameCommand.getGameID(), userGameCommand.getAuthToken());
-//            case REDRAW -> redraw(userGameCommand.getGameID(), userGameCommand.getAuthToken(), userGameCommand.getName());
+            case MAKE_MOVE -> makeMove(userGameCommand.getMove(), userGameCommand.getGameID(), userGameCommand.getAuthToken(), session);
             case LEAVE -> leave(userGameCommand.getGameID(), userGameCommand.getAuthToken());
             case RESIGN -> resign(userGameCommand.getAuthToken(), userGameCommand.getGameID());
         }
     }
-
-//    private void error(String name) throws IOException {
-//        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-//        notification.setMessage("Error");
-//        connections.sendOne(name, notification);
-//    }
 
     private void resign(String authToken, Integer gameID) throws DataAccessException, IOException {
         String name = getVisitorName(authToken);
@@ -88,9 +75,16 @@ public class WebSocketHandler {
     }
 
 
-    private void makeMove(ChessMove chessMove, Integer gameID, String authToken) throws IOException, DataAccessException {
+    private void makeMove(ChessMove chessMove, Integer gameID, String authToken, Session session) throws IOException, DataAccessException {
         String visitorName = getVisitorName(authToken);
         var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        if (visitorName == null) {
+            notification = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+            notification.setErrorMessage("Error: bad authToken");
+            Connection badConnection = new Connection("bad", session);
+            badConnection.send(new Gson().toJson(notification));
+            return;
+        }
         GameData gameData = Server.gameService.getGame(authToken, String.valueOf(gameID));
         ChessGame game = gameData.game();
         if (game.isResigned()) {
@@ -148,44 +142,31 @@ public class WebSocketHandler {
 
     private void connect( int gameID, Session session, String authToken) throws IOException, DataAccessException {
         String visitorName = getVisitorName(authToken);
-        connections.add(visitorName, gameID, session);
         var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        if (visitorName == null) {
+            notification = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+            notification.setErrorMessage("Error: bad authToken");
+            Connection badConnection = new Connection("bad", session);
+            badConnection.send(new Gson().toJson(notification));
+            return;
+        }
+        GameData gameData = Server.gameService.getGame(authToken, String.valueOf(gameID));
+        if (gameData == null) {
+            notification = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+            notification.setErrorMessage("Error: bad gameID");
+            Connection badConnection = new Connection("bad", session);
+            badConnection.send(new Gson().toJson(notification));
+            return;
+        }
+        connections.add(visitorName, gameID, session);
         notification.setMessage(visitorName + " joined the game.");
 //        session.getRemote().sendString("we got here!");
         connections.broadcast(visitorName, gameID, notification);
-        GameData gameData = Server.gameService.getGame(authToken, String.valueOf(gameID));
+
         var notification2 = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
 //        notification2.setMessage(new Gson().toJson(gameData));
         notification2.setGame(gameData);
         connections.sendOne(visitorName, notification2);
     }
 
-//    private void join(String visitorName, int gameID, String color, Session session, String authToken) throws IOException, DataAccessException {
-//        connections.add(visitorName, gameID, session);
-//        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-//        notification.setMessage(visitorName + " joined the game as " + color + ".");
-////        session.getRemote().sendString("we got here!");
-//        connections.broadcast(visitorName, gameID, notification);
-//        GameData gameData = Server.gameService.getGame(authToken, String.valueOf(gameID));
-//        var notification2 = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
-//        notification2.setMessage(new Gson().toJson(gameData));
-//        connections.sendOne(visitorName, notification2);
-//    }
-//
-//    private void exit(String visitorName) throws IOException {
-//        connections.remove(visitorName);
-//        var message = String.format("%s left the shop", visitorName);
-//        var notification = new Notification(Notification.Type.DEPARTURE, message);
-//        connections.broadcast(visitorName, notification);
-//    }
-//
-//    public void makeNoise(String petName, String sound) throws ResponseException {
-//        try {
-//            var message = String.format("%s says %s", petName, sound);
-//            var notification = new Notification(Notification.Type.NOISE, message);
-//            connections.broadcast("", notification);
-//        } catch (Exception ex) {
-//            throw new ResponseException(500, ex.getMessage());
-//        }
-//    }
 }
