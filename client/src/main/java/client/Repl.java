@@ -61,12 +61,13 @@ public class Repl implements ServerMessageHandler{
     private void loadGame(ServerMessage serverMessage) {
 //        GameData game = new Gson().fromJson(serverMessage.getMessage(), GameData.class);
         GameData game = serverMessage.getGame();
+        client.setCurrGame(game);
         System.out.println();
         String playerColor = "WHITE";
         if (game.blackUsername() != null && game.blackUsername().equals(client.getVisitorName())) {
             playerColor = "BLACK";
         }
-        System.out.println(ChessClient.drawBoard(playerColor, game.game().getBoard()));
+        System.out.println(ChessClient.drawBoard(playerColor, game.game().getBoard(), null));
     }
 }
 
