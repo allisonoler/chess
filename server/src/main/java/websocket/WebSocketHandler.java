@@ -119,7 +119,7 @@ public class WebSocketHandler {
             game.makeMove(chessMove);
             Server.gameService.updateGame(authToken, gameData.gameID(), new GameData(gameData.gameID(),
                     gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
-            notification.setMessage(visitorName + "made the move: " + prettyMove(chessMove));
+            notification.setMessage(visitorName + " made the move: " + prettyMove(chessMove));
             connections.broadcast(visitorName, gameID, notification);
 
             if ((game.isInCheck(ChessGame.TeamColor.WHITE))) {
