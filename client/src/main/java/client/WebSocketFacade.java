@@ -55,13 +55,16 @@ public class WebSocketFacade extends Endpoint {
             char letter2 = endString.charAt(0);
             int endpos2 = (int)(endString.charAt(1)-'0');
             int startpos2 = letter2 - 'a' + 1;
-            ChessPiece.PieceType type = switch (pieceType) {
-                case "QUEEN" -> ChessPiece.PieceType.QUEEN;
-                case "ROOK" -> ChessPiece.PieceType.ROOK;
-                case "BISHOP" -> ChessPiece.PieceType.BISHOP;
-                case "KNIGHT" -> ChessPiece.PieceType.KNIGHT;
-                default -> null;
-            };
+            ChessPiece.PieceType type = null;
+            if (pieceType != null ) {
+                type = switch (pieceType) {
+                    case "QUEEN" -> ChessPiece.PieceType.QUEEN;
+                    case "ROOK" -> ChessPiece.PieceType.ROOK;
+                    case "BISHOP" -> ChessPiece.PieceType.BISHOP;
+                    case "KNIGHT" -> ChessPiece.PieceType.KNIGHT;
+                    default -> null;
+                };
+            }
 
             ChessMove chessMove = new ChessMove(new ChessPosition(endpos1, startpos1), new ChessPosition(endpos2, startpos2), type);
             var userGameCommand = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authtoken, Integer.valueOf(gameID));

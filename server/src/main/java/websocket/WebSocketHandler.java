@@ -119,7 +119,7 @@ public class WebSocketHandler {
             game.makeMove(chessMove);
             Server.gameService.updateGame(authToken, gameData.gameID(), new GameData(gameData.gameID(),
                     gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
-            notification.setMessage(visitorName + "made the move: " + chessMove.toString());
+            notification.setMessage(visitorName + "made the move: " + prettyMove(chessMove));
             connections.broadcast(visitorName, gameID, notification);
 
             if ((game.isInCheck(ChessGame.TeamColor.WHITE))) {
@@ -188,6 +188,38 @@ public class WebSocketHandler {
         notification.setErrorMessage("Error: bad authToken");
         Connection badConnection = new Connection("bad", session);
         badConnection.send(new Gson().toJson(notification));
+    }
+
+    private String numToLetter(int num) {
+        if (num ==1) {
+            return "a";
+        } else if (num ==2) {
+            return "b";
+        } else if (num ==3) {
+            return "c";
+        }else if (num ==4) {
+            return "d";
+        }else if (num ==5) {
+            return "e";
+        }else if (num ==6) {
+            return "f";
+        } else if (num ==7) {
+            return "g";
+        }else if (num ==8) {
+            return "h";
+        }else {
+            return "";
+        }
+    }
+
+    private String prettyMove(ChessMove move) {
+        String result = "";
+        result += numToLetter(move.getStartPosition().getColumn());
+        result+= move.getStartPosition().getRow();
+        result += " to ";
+        result += numToLetter(move.getEndPosition().getColumn());
+        result+= move.getEndPosition().getRow();
+        return result;
     }
 
 }

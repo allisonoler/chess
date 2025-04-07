@@ -5,10 +5,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import chess.ChessBoard;
-import chess.ChessMove;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import model.GameData;
 import requestsresults.*;
 import ui.EscapeSequences;
@@ -169,12 +166,13 @@ public class ChessClient {
     }
 
     public String makeMove(String... params) throws ResponseException {
-        if ((params.length == 2 || params.length == 3) && validateMoveInput(params[0]) && validateMoveInput(params[1])
-        && (params[2].equals("QUEEN") || params[2].equals("BISHOP") || params[2].equals("KNIGHT") || params[2].equals("ROOK"))) {
+        if ((params.length == 2 || params.length == 3) && validateMoveInput(params[0]) && validateMoveInput(params[1])) {
             assertGameplay();
             String pieceType = null;
-            if (params.length == 3) {
-                pieceType = params[2];
+            if (3 == params.length) {
+                if (params[2].equals("QUEEN") || params[2].equals("BISHOP") || params[2].equals("KNIGHT") || params[2].equals("ROOK")) {
+                    pieceType = params[2];
+                }
             }
             ws.makeMove(this.visitorName, this.visitorAuthToken, params[0], params[1], pieceType,gameID);
             return "";
@@ -269,6 +267,7 @@ public class ChessClient {
 
     public static String drawBoard(String playerColor, ChessBoard board, Collection<ChessMove> possibleMoves) {
         StringBuilder returnResult = new StringBuilder();
+        returnResult.append(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
         boolean colorSwitch = true;
         String columnLabel = "    a  b  c  d  e  f  g  h    ";
         ArrayList<Integer> rows = new ArrayList<Integer>();
@@ -320,18 +319,26 @@ public class ChessClient {
                 }
                 if (board.getPiece(new ChessPosition(i,j)) == null) {
                     returnResult.append("   ");
-                } else if (board.getPiece(new ChessPosition(i, j)).getPieceType().equals(ChessPiece.PieceType.ROOK)) {
-                    returnResult.append(" R ");
-                } else if (board.getPiece(new ChessPosition(i, j)).getPieceType().equals(ChessPiece.PieceType.KNIGHT)) {
-                    returnResult.append(" N ");
-                } else if (board.getPiece(new ChessPosition(i, j)).getPieceType().equals(ChessPiece.PieceType.BISHOP)) {
-                    returnResult.append(" B ");
-                } else if (board.getPiece(new ChessPosition(i, j)).getPieceType().equals(ChessPiece.PieceType.QUEEN)) {
-                    returnResult.append(" Q ");
-                } else if (board.getPiece(new ChessPosition(i, j)).getPieceType().equals(ChessPiece.PieceType.KING)) {
-                    returnResult.append(" K ");
-                } else if (board.getPiece(new ChessPosition(i, j)).getPieceType().equals(ChessPiece.PieceType.PAWN)) {
-                    returnResult.append(" P ");
+                } else {
+                    if (board.getPiece(new ChessPosition(i, j)).getTeamColor().equals(ChessGame.TeamColor.BLACK)) {
+                        returnResult.append(EscapeSequences.SET_TEXT_COLOR_BLACK);
+                    } else {
+                        returnResult.append(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
+                    }
+                    if (board.getPiece(new ChessPosition(i, j)).getPieceType().equals(ChessPiece.PieceType.ROOK)) {
+                        returnResult.append(" R ");
+                    } else if (board.getPiece(new ChessPosition(i, j)).getPieceType().equals(ChessPiece.PieceType.KNIGHT)) {
+                        returnResult.append(" N ");
+                    } else if (board.getPiece(new ChessPosition(i, j)).getPieceType().equals(ChessPiece.PieceType.BISHOP)) {
+                        returnResult.append(" B ");
+                    } else if (board.getPiece(new ChessPosition(i, j)).getPieceType().equals(ChessPiece.PieceType.QUEEN)) {
+                        returnResult.append(" Q ");
+                    } else if (board.getPiece(new ChessPosition(i, j)).getPieceType().equals(ChessPiece.PieceType.KING)) {
+                        returnResult.append(" K ");
+                    } else if (board.getPiece(new ChessPosition(i, j)).getPieceType().equals(ChessPiece.PieceType.PAWN)) {
+                        returnResult.append(" P ");
+                    }
+                    returnResult.append(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
                 }
             }
             colorSwitch = !colorSwitch;
