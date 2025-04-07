@@ -120,22 +120,37 @@ public class WebSocketHandler {
                     gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
             notification.setMessage(visitorName + "made the move: " + chessMove.toString());
             connections.broadcast(visitorName, gameID, notification);
-            if ((game.isInCheck(ChessGame.TeamColor.WHITE) && color.equals("WHITE")) ||
-                    (game.isInCheck(ChessGame.TeamColor.BLACK) && color.equals("BLACK"))) {
+//            if ((game.isInCheck(ChessGame.TeamColor.WHITE) && color.equals("WHITE")) ||
+//                    (game.isInCheck(ChessGame.TeamColor.BLACK) && color.equals("BLACK"))) {
+//                notification= new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+//                notification.setMessage(color + " is in check!");
+//                connections.broadcast(null, gameID, notification);
+//            }
+            if ((game.isInCheck(ChessGame.TeamColor.WHITE))) {
                 notification= new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-                notification.setMessage(color + " is in check!");
+                notification.setMessage("WHITE is in check!");
+                if ((game.isInCheckmate(ChessGame.TeamColor.WHITE))) {
+                    notification.setMessage("WHITE is in checkmate!");
+                }
                 connections.broadcast(null, gameID, notification);
             }
-            if ((game.isInCheckmate(ChessGame.TeamColor.WHITE) && color.equals("BLACK")) ||
-                    (game.isInCheckmate(ChessGame.TeamColor.BLACK) && color.equals("WHITE"))) {
+            if ((game.isInCheck(ChessGame.TeamColor.BLACK))) {
                 notification= new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-                notification.setMessage(color + " is in checkmate!");
+                notification.setMessage("BLACK is in check!");
+                if ((game.isInCheckmate(ChessGame.TeamColor.BLACK))) {
+                    notification.setMessage("BLACK is in checkmate!");
+                }
                 connections.broadcast(null, gameID, notification);
             }
-            if ((game.isInStalemate(ChessGame.TeamColor.WHITE) && color.equals("BLACK")) ||
-                    (game.isInStalemate(ChessGame.TeamColor.BLACK) && color.equals("WHITE"))) {
+
+            if ((game.isInStalemate(ChessGame.TeamColor.WHITE))) {
                 notification= new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-                notification.setMessage(color + " is in stalemate!");
+                notification.setMessage("WHITE is in stalemate!");
+                connections.broadcast(null, gameID, notification);
+            }
+            if ((game.isInStalemate(ChessGame.TeamColor.BLACK))) {
+                notification= new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+                notification.setMessage("BLACK is in stalemate!");
                 connections.broadcast(null, gameID, notification);
             }
             var notification2 = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);

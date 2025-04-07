@@ -169,9 +169,14 @@ public class ChessClient {
     }
 
     public String makeMove(String... params) throws ResponseException {
-        if (params.length == 2 && validateMoveInput(params[0]) && validateMoveInput(params[1])) {
+        if ((params.length == 2 || params.length == 3) && validateMoveInput(params[0]) && validateMoveInput(params[1])
+        && (params[2].equals("QUEEN") || params[2].equals("BISHOP") || params[2].equals("KNIGHT") || params[2].equals("ROOK"))) {
             assertGameplay();
-            ws.makeMove(this.visitorName, this.visitorAuthToken, params[0], params[1], gameID);
+            String pieceType = null;
+            if (params.length == 3) {
+                pieceType = params[2];
+            }
+            ws.makeMove(this.visitorName, this.visitorAuthToken, params[0], params[1], pieceType,gameID);
             return "";
         }
         throw new ResponseException(400, "Invalid input");
@@ -360,7 +365,7 @@ public class ChessClient {
             return """
                     redraw - the chessboard
                     leave - the game
-                    move <POSITION> <POSITION>(ex: a4 f8) - make move
+                    move <POSITION> <POSITION> <PROMOTION NAME> (ex: a4 f8, only put promotion if applicable!) - make move
                     resign - give up in game
                     leave - leave game
                     highlight <POSITION> (ex: a4) - highlights all valid squares for selected piece

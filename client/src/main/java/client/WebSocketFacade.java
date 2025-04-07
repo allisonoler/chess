@@ -1,6 +1,7 @@
 package client;
 
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
@@ -45,7 +46,7 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void makeMove(String visitorName, String authtoken, String startString, String endString, Integer gameID) throws ResponseException {
+    public void makeMove(String visitorName, String authtoken, String startString, String endString, String pieceType, Integer gameID) throws ResponseException {
         try {
             char letter1 = startString.charAt(0);
             int endpos1 = (int)(startString.charAt(1)-'0');
@@ -53,8 +54,15 @@ public class WebSocketFacade extends Endpoint {
             char letter2 = endString.charAt(0);
             int endpos2 = (int)(endString.charAt(1)-'0');
             int startpos2 = letter2 - 'a' + 1;
+            ChessPiece.PieceType type = switch (pieceType) {
+                case "QUEEN" -> ChessPiece.PieceType.QUEEN;
+                case "ROOK" -> ChessPiece.PieceType.ROOK;
+                case "BISHOP" -> ChessPiece.PieceType.BISHOP;
+                case "KNIGHT" -> ChessPiece.PieceType.KNIGHT;
+                default -> null;
+            };
 
-            ChessMove chessMove = new ChessMove(new ChessPosition(endpos1, startpos1), new ChessPosition(endpos2, startpos2), null);
+            ChessMove chessMove = new ChessMove(new ChessPosition(endpos1, startpos1), new ChessPosition(endpos2, startpos2), type);
             var userGameCommand = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authtoken, Integer.valueOf(gameID));
             userGameCommand.setMove(chessMove);
             this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
