@@ -46,7 +46,8 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void makeMove(String visitorName, String authtoken, String startString, String endString, String pieceType, Integer gameID) throws ResponseException {
+    public void makeMove(String visitorName, String authtoken, String startString, String endString, String pieceType,
+                         Integer gameID) throws ResponseException {
         try {
             char letter1 = startString.charAt(0);
             int endpos1 = (int)(startString.charAt(1)-'0');

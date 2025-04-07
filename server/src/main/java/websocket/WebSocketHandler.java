@@ -96,10 +96,11 @@ public class WebSocketHandler {
 
 //        if (gameData.blackUsername() != null && gameData.blackUsername().equals(visitorName) && game.getTeamTurn())
 
-        if (!(gameData.blackUsername() != null && (game.getTeamTurn().equals(ChessGame.TeamColor.BLACK) && gameData.blackUsername().equals(visitorName)) ||
-                (gameData.whiteUsername() != null && game.getTeamTurn().equals(ChessGame.TeamColor.WHITE) && gameData.whiteUsername().equals(visitorName)))) {
-            if (!(gameData.blackUsername() != null && gameData.blackUsername().equals(visitorName) || gameData.whiteUsername() != null &&
-                    gameData.whiteUsername().equals(visitorName))) {
+        if (!(gameData.blackUsername() != null && (game.getTeamTurn().equals(ChessGame.TeamColor.BLACK) &&
+                gameData.blackUsername().equals(visitorName)) || (gameData.whiteUsername() != null &&
+                game.getTeamTurn().equals(ChessGame.TeamColor.WHITE) && gameData.whiteUsername().equals(visitorName)))) {
+            if (!(gameData.blackUsername() != null && gameData.blackUsername().equals(visitorName) ||
+                    gameData.whiteUsername() != null && gameData.whiteUsername().equals(visitorName))) {
                 notification = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
                 notification.setErrorMessage("Error: You are observing.");
             }
@@ -120,12 +121,7 @@ public class WebSocketHandler {
                     gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
             notification.setMessage(visitorName + "made the move: " + chessMove.toString());
             connections.broadcast(visitorName, gameID, notification);
-//            if ((game.isInCheck(ChessGame.TeamColor.WHITE) && color.equals("WHITE")) ||
-//                    (game.isInCheck(ChessGame.TeamColor.BLACK) && color.equals("BLACK"))) {
-//                notification= new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-//                notification.setMessage(color + " is in check!");
-//                connections.broadcast(null, gameID, notification);
-//            }
+
             if ((game.isInCheck(ChessGame.TeamColor.WHITE))) {
                 notification= new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
                 notification.setMessage("WHITE is in check!");
